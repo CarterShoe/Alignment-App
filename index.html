@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aligned">
+<meta name="theme-color" content="#1c1a17">
+<title>Aligned — Sacred Daily Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Earth tone palette — warm, grounding, psychologically calming */
+  --ink: #1c1a17;        /* warm charcoal — softer than black */
+  --ink2: #211f1b;       /* slightly lighter warm dark */
+  --panel: #282420;      /* warm dark brown panel */
+  --panel2: #201e1a;     /* deeper panel */
+  --sage: #7a9e7e;       /* muted forest sage green — primary accent */
+  --sage2: #a3c4a7;      /* lighter sage for highlights */
+  --sage-dim: #3a5c3c;   /* deep forest dim */
+  --sage-glow: rgba(122,158,126,0.13);
+  --clay: #c4845a;       /* warm terracotta clay — secondary accent */
+  --clay-dim: #6b3e22;   /* deep clay */
+  --sand: #e8dcc8;       /* warm sand / cream — main text */
+  --sand2: #cfc3ad;      /* muted sand for secondary text */
+  --muted: #6b6358;      /* warm brown muted */
+  --muted2: #9c9183;     /* warm taupe muted */
+  --border: rgba(122,158,126,0.13);
+  --border2: rgba(122,158,126,0.28);
+  --success: #7a9e7e;
+  --danger: #c4845a;
+  /* Keep chakra colors vivid for identification */
+  --root-c: #c0543a;
+  --sacral-c: #c4845a;
+  --solar-c: #c9a84c;
+  --heart-c: #7a9e7e;
+  --throat-c: #5a8fa3;
+  --third-c: #8a7ab5;
+  --crown-c: #a889c4;
+  /* Aliases for old variable names — so all existing code still works */
+  --teal: var(--sage);
+  --teal2: var(--sage2);
+  --teal-dim: var(--sage-dim);
+  --teal-glow: var(--sage-glow);
+  --lavender: #8a7ab5;
+  --lav-dim: #4a3d6e;
+  --rose: var(--clay);
+  --cream: var(--sand);
+  --cream2: var(--sand2);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+body {
+  height:100%;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Warm earth ambient glow */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 80%, rgba(122,158,126,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 10%, rgba(196,132,90,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(232,220,200,0.02) 0%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Grain texture */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:1000;
+  opacity:0.3;
+}
+
+#app {
+  position:relative;
+  z-index:1;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.4s ease, transform 0.4s ease;
+  transform:translateY(12px);
+  overflow:hidden;
+}
+.screen.active {
+  opacity:1;
+  pointer-events:all;
+  transform:translateY(0);
+}
+
+.scroll-body {
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.scroll-body::-webkit-scrollbar { display:none; }
+
+/* ===== TOP BAR ===== */
+.top-bar {
+  display:flex;
+  align-items:center;
+  padding:16px 20px 12px;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,15,30,0.9);
+  backdrop-filter:blur(12px);
+  flex-shrink:0;
+  position:relative;
+}
+.top-bar-title { flex:1; text-align:center; }
+.top-bar-title .label {
+  font-family:'Jost',sans-serif;
+  font-size:9px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--muted2);
+  display:block;
+  margin-bottom:2px;
+}
+.top-bar-title .title {
+  font-family:'Cinzel',serif;
+  font-size:14px;
+  color:var(--teal);
+  letter-spacing:1px;
+}
+.icon-btn {
+  background:none; border:none;
+  color:var(--teal);
+  font-size:22px;
+  cursor:pointer;
+  padding:4px 8px;
+  line-height:1;
+  min-width:36px;
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity 0.2s;
+}
+.icon-btn:active { opacity:0.6; }
+.icon-btn.muted { color:var(--muted2); font-size:16px; }
+
+.progress-bar { height:2px; background:rgba(78,205,196,0.06); flex-shrink:0; }
+.progress-fill {
+  height:100%;
+  background:linear-gradient(to right, var(--teal-dim), var(--teal));
+  transition:width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ===== AUTH SCREEN ===== */
+#auth {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 28px 60px;
+  background:var(--ink);
+  opacity:1;
+  pointer-events:all;
+  transform:none;
+  position:absolute;
+  inset:0;
+  z-index:200;
+  transition:opacity 0.5s ease;
+}
+#auth.hidden { opacity:0; pointer-events:none; }
+
+.auth-glyph {
+  font-size:48px;
+  margin-bottom:24px;
+  animation:breathe 4s ease-in-out infinite;
+}
+.auth-logo {
+  font-family:'Cinzel',serif;
+  font-size:36px;
+  color:var(--teal);
+  letter-spacing:4px;
+  margin-bottom:6px;
+}
+.auth-tagline {
+  font-size:12px;
+  letter-spacing:3px;
+  color:var(--muted2);
+  text-transform:uppercase;
+  margin-bottom:48px;
+}
+.auth-tabs {
+  display:flex;
+  gap:0;
+  width:100%;
+  max-width:340px;
+  margin-bottom:24px;
+  border:1px solid var(--border);
+}
+.auth-tab {
+  flex:1;
+  padding:11px;
+  font-family:'Jost',sans-serif;
+  font-size:11px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  border:none;
+  background:transparent;
+  color:var(--muted2);
+  cursor:pointer;
+  transition:all 0.25s;
+}
+.auth-tab.active { background:var(--teal-glow); color:var(--teal); }
+
+.auth-form { width:100%; max-width:340px; display:flex; flex-direction:column; gap:14px; }
+.auth-input {
+  width:100%;
+  padding:14px 16px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  color:var(--cream);
+  font-family:'Jost',sans-serif;
+  font-size:15px;
+  font-weight:300;
+  outline:none;
+  transition:border-color 0.25s;
+  border-radius:2px;
+  -webkit-appearance:none;
+}
+.auth-input:focus { border-color:var(--border2); }
+.auth-input::placeholder { color:var(--muted); }
+
+.auth-submit {
+  width:100%;
+  padding:15px;
+  background:var(--teal);
+  border:none;
+  color:var(--ink);
+  font-family:'Cinzel',serif;
+  font-size:12px;
+  letter-spacing:3px;
+  cursor:pointer;
+  transition:all 0.25s;
+  border-radius:2px;
+  font-weight:600;
+}
+.auth-submit:hover { background:var(--teal2); }
+
+.auth-divider {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:2px;
+}
+.auth-divider::before, .auth-divider::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+.auth-guest-btn {
+  width:100%;
+  max-width:340px;
+  padding:14px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted2);
+  font-family:'Jost',sans-serif;
+  font-size:11px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.25s;
+  border-radius:2px;
+}
+.auth-guest-btn:hover { color:var(--cream); border-color:var(--border2); }
+.auth-error { font-size:12px; color:var(--rose); text-align:center; min-height:16px; }
+
+/* ===== HOME ===== */
+#home {
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:0 0 40px;
+}
+#home::-webkit-scrollbar { display:none; }
+
+.home-hero {
+  text-align:center;
+  padding:48px 28px 28px;
+  position:relative;
+}
+.home-eyebrow {
+  font-size:9px;
+  letter-spacing:5px;
+  text-transform:uppercase;
+  color:var(--teal);
+  opacity:0.7;
+  margin-bottom:14px;
+}
+.home-name {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,9vw,52px);
+  font-weight:300;
+  line-height:1.1;
+  color:var(--cream);
+  margin-bottom:6px;
+}
+.home-name em { font-style:italic; color:var(--teal2); }
+.home-username {
+  font-size:12px;
+  color:var(--muted2);
+  letter-spacing:2px;
+  margin-top:8px;
+}
+.home-date { font-size:12px; color:var(--muted2); margin-top:6px; letter-spacing:0.5px; }
+
+/* Streak ring */
+.streak-wrap {
+  display:flex; flex-direction:column; align-items:center;
+  margin:4px auto 28px;
+}
+.ring-container {
+  position:relative; width:110px; height:110px;
+}
+.ring-container svg { transform:rotate(-90deg); }
+.ring-center {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.ring-number {
+  font-family:'Cormorant Garamond',serif;
+  font-size:36px; color:var(--teal); line-height:1;
+}
+.ring-word { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted2); margin-top:3px; }
+
+.chakra-row { display:flex; justify-content:center; gap:8px; margin:16px 0 0; }
+.ch-dot {
+  width:10px; height:10px; border-radius:50%; border:1px solid;
+  position:relative; transition:all 0.4s ease;
+}
+.ch-dot.lit::after {
+  content:''; position:absolute; inset:2px;
+  border-radius:50%; background:currentColor;
+}
+.ch-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:10px; }
+
+/* ===== DAILY TRACKER ===== */
+.tracker-strip {
+  margin:0 20px 20px;
+  padding:16px 18px;
+  border:1px solid var(--border);
+  background:rgba(78,205,196,0.03);
+  border-radius:4px;
+}
+.tracker-strip-title {
+  font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--teal); margin-bottom:12px;
+}
+.tracker-days {
+  display:flex; gap:6px; justify-content:space-between;
+}
+.tracker-day {
+  display:flex; flex-direction:column; align-items:center; gap:4px; flex:1;
+}
+.tracker-day-label { font-size:8px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); }
+.tracker-day-circle {
+  width:28px; height:28px; border-radius:50%;
+  border:1.5px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; color:var(--muted);
+  transition:all 0.3s;
+}
+.tracker-day-circle.done { background:var(--teal); border-color:var(--teal); color:var(--ink); }
+.tracker-day-circle.today { border-color:var(--teal2); color:var(--teal2); }
+.tracker-day-circle.partial { border-color:var(--lavender); background:rgba(167,139,250,0.15); color:var(--lavender); }
+
+/* Menu section */
+.menu-section {
+  padding:0 20px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.menu-card {
+  display:flex; align-items:center; gap:16px;
+  padding:18px 20px;
+  border:1px solid var(--border);
+  background:rgba(78,205,196,0.02);
+  cursor:pointer;
+  transition:all 0.25s ease;
+  text-align:left; width:100%;
+  position:relative; overflow:hidden;
+  border-radius:3px;
+}
+.menu-card::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:2px;
+  background:var(--teal); opacity:0; transition:opacity 0.25s;
+}
+.menu-card:hover::before, .menu-card:active::before { opacity:1; }
+.menu-card:hover, .menu-card:active {
+  background:rgba(78,205,196,0.06);
+  border-color:rgba(78,205,196,0.28);
+}
+.menu-card .mc-icon { font-size:22px; flex-shrink:0; width:36px; text-align:center; }
+.menu-card .mc-body { flex:1; }
+.menu-card .mc-title {
+  font-family:'Cinzel',serif; font-size:13px; color:var(--cream);
+  letter-spacing:1px; margin-bottom:3px;
+}
+.menu-card .mc-sub { font-size:11px; color:var(--muted2); letter-spacing:1px; }
+.menu-card .mc-badge {
+  background:var(--teal); color:var(--ink);
+  font-size:9px; letter-spacing:1px; padding:2px 8px; border-radius:20px;
+  font-weight:500; flex-shrink:0;
+}
+.menu-card .mc-arrow { color:var(--teal-dim); font-size:20px; }
+.menu-divider { height:1px; background:var(--border); margin:6px 0; }
+
+.ghost-btn {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 20px;
+  border:1px solid rgba(78,205,196,0.07);
+  background:transparent;
+  color:var(--muted2);
+  font-family:'Jost',sans-serif;
+  font-size:11px; letter-spacing:3px; text-transform:uppercase;
+  cursor:pointer; width:100%; transition:all 0.25s; border-radius:3px;
+}
+.ghost-btn:hover, .ghost-btn:active { color:var(--teal); border-color:var(--border); }
+
+.home-signout {
+  text-align:center; margin-top:24px;
+}
+.signout-btn {
+  background:none; border:none;
+  color:var(--muted); font-size:11px; letter-spacing:2px;
+  text-transform:uppercase; cursor:pointer;
+  font-family:'Jost',sans-serif;
+  padding:8px 16px;
+  transition:color 0.2s;
+}
+.signout-btn:hover { color:var(--rose); }
+
+/* ===== RITUAL SCREEN ===== */
+.steps-list { padding:16px 16px 160px; }
+
+.step-item {
+  border:1px solid var(--border); margin-bottom:10px;
+  background:rgba(255,255,255,0.012);
+  transition:all 0.3s ease; overflow:hidden; border-radius:3px;
+}
+.step-item.is-open { border-color:rgba(78,205,196,0.32); background:rgba(78,205,196,0.04); }
+.step-item.is-done { opacity:0.48; border-color:rgba(78,205,196,0.08); }
+
+.step-head {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 16px; cursor:pointer; user-select:none;
+}
+.step-dot {
+  width:10px; height:10px; border-radius:50%; border:1.5px solid;
+  flex-shrink:0; transition:all 0.3s; position:relative;
+}
+.step-dot.filled { background:currentColor; }
+.step-meta { flex:1; min-width:0; }
+.step-num { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+.step-name { font-family:'Cinzel',serif; font-size:13px; color:var(--cream); letter-spacing:0.5px; }
+.step-sub { font-size:11px; color:var(--muted2); margin-top:2px; font-style:italic; }
+.step-check-circle {
+  width:26px; height:26px; border-radius:50%;
+  border:1.5px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-size:12px; color:var(--teal);
+  transition:all 0.3s ease; cursor:pointer;
+}
+.step-check-circle.checked { background:var(--teal); border-color:var(--teal); color:var(--ink); }
+
+.step-body { max-height:0; overflow:hidden; transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1); }
+.step-body.open { max-height:800px; }
+.step-inner { padding:0 16px 18px; border-top:1px solid rgba(78,205,196,0.06); }
+
+.freq-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 12px; border:1px solid rgba(78,205,196,0.2);
+  font-size:10px; letter-spacing:2px; color:var(--teal); margin:14px 0 10px;
+  border-radius:20px;
+}
+
+.affirmation-opener {
+  font-family:'Cinzel',serif; font-size:12px; letter-spacing:3px;
+  text-transform:uppercase; margin-top:12px; margin-bottom:6px;
+}
+.affirmation-body {
+  font-family:'Cormorant Garamond',serif; font-size:18px;
+  line-height:1.85; color:var(--cream); font-weight:300;
+  font-style:italic; margin-bottom:16px;
+}
+.step-detail {
+  font-size:13px; line-height:1.75; color:var(--muted2); margin:10px 0 16px;
+}
+
+.audio-controls { display:flex; gap:8px; margin-bottom:12px; }
+.audio-btn {
+  flex:1; padding:11px 8px;
+  border:1px solid var(--border2);
+  background:rgba(78,205,196,0.04);
+  color:var(--cream);
+  font-family:'Jost',sans-serif;
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  transition:all 0.25s; border-radius:2px;
+}
+.audio-btn:hover, .audio-btn:active { background:rgba(78,205,196,0.1); border-color:rgba(78,205,196,0.4); }
+.audio-btn.active { background:rgba(78,205,196,0.14); border-color:var(--teal); color:var(--teal); }
+.audio-btn .btn-icon { font-size:15px; }
+
+.wave-indicator { display:inline-flex; align-items:center; gap:2px; height:16px; }
+.wave-b {
+  width:2.5px; background:var(--teal); border-radius:2px;
+  animation:waveAnim var(--d,0.7s) ease-in-out infinite var(--delay,0s);
+}
+@keyframes waveAnim { 0%,100%{height:3px} 50%{height:12px} }
+
+.mark-done-btn {
+  width:100%; padding:12px;
+  border:1px solid rgba(78,205,196,0.22);
+  background:rgba(78,205,196,0.04);
+  color:var(--teal);
+  font-family:'Jost',sans-serif;
+  font-size:10px; letter-spacing:3px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.25s; border-radius:2px;
+}
+.mark-done-btn:hover, .mark-done-btn:active { background:rgba(78,205,196,0.12); }
+.mark-done-btn.undone { border-color:var(--border); color:var(--muted2); background:transparent; }
+
+/* Floating audio bar */
+.audio-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--panel2);
+  border-top:1px solid var(--border2);
+  padding:12px 18px 20px;
+  transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  z-index:100;
+  backdrop-filter:blur(12px);
+}
+.audio-bar.visible { transform:translateY(0); }
+.audio-bar-inner { display:flex; align-items:center; gap:14px; }
+.audio-bar-info { flex:1; min-width:0; }
+.audio-bar-title {
+  font-family:'Cinzel',serif; font-size:12px; color:var(--teal);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.audio-bar-sub { font-size:11px; color:var(--muted2); margin-top:2px; font-style:italic; }
+.audio-bar-controls { display:flex; align-items:center; gap:10px; }
+.ab-btn {
+  background:none; border:1px solid var(--border2); color:var(--teal);
+  width:36px; height:36px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:14px; transition:all 0.2s;
+}
+.ab-btn:hover { background:rgba(78,205,196,0.1); }
+.ab-btn.stop { border-color:rgba(249,127,163,0.3); color:rgba(249,127,163,0.7); }
+.ab-btn.stop:hover { background:rgba(249,127,163,0.08); }
+
+/* ===== JOURNAL ===== */
+.journal-tabs {
+  display:flex; border-bottom:1px solid var(--border);
+  background:rgba(10,15,30,0.9); flex-shrink:0;
+}
+.j-tab {
+  flex:1; padding:14px 8px;
+  font-size:10px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--muted2); text-align:center; cursor:pointer;
+  border:none; background:transparent;
+  border-bottom:2px solid transparent; transition:all 0.25s;
+  font-family:'Jost',sans-serif;
+}
+.j-tab.active { color:var(--teal); border-bottom-color:var(--teal); }
+
+.journal-content { padding:20px 18px 100px; }
+.j-date-line { font-family:'Cormorant Garamond',serif; font-size:24px; color:var(--teal2); margin-bottom:4px; }
+.j-date-sub { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:24px; }
+
+.j-prompt {
+  border:1px solid var(--border); margin-bottom:12px;
+  overflow:hidden; transition:border-color 0.25s; border-radius:3px;
+}
+.j-prompt.has-content { border-color:rgba(78,205,196,0.22); }
+.j-prompt-head { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; cursor:pointer; }
+.j-prompt-cat {
+  font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  padding:3px 8px; border:1px solid; flex-shrink:0; margin-top:2px;
+  border-radius:2px;
+}
+.j-prompt-text { flex:1; font-family:'Cormorant Garamond',serif; font-size:16px; line-height:1.5; color:var(--cream); font-weight:300; }
+.j-chevron { color:var(--muted); font-size:16px; transition:transform 0.3s; flex-shrink:0; padding-top:2px; }
+.j-chevron.open { transform:rotate(90deg); }
+.j-prompt-body { max-height:0; overflow:hidden; transition:max-height 0.4s ease; }
+.j-prompt-body.open { max-height:400px; }
+.j-prompt-inner { padding:0 16px 16px; border-top:1px solid rgba(78,205,196,0.06); }
+.j-textarea {
+  width:100%; background:rgba(255,255,255,0.025);
+  border:1px solid rgba(78,205,196,0.1);
+  color:var(--cream); font-family:'Cormorant Garamond',serif;
+  font-size:16px; line-height:1.75; padding:12px 14px;
+  resize:none; min-height:110px; margin-top:12px;
+  outline:none; transition:border-color 0.25s;
+  -webkit-appearance:none; border-radius:2px;
+}
+.j-textarea:focus { border-color:rgba(78,205,196,0.35); }
+.j-textarea::placeholder { color:var(--muted); font-style:italic; font-size:14px; }
+.j-save-btn {
+  width:100%; padding:10px; margin-top:8px;
+  border:1px solid rgba(78,205,196,0.18);
+  background:transparent; color:var(--teal);
+  font-family:'Jost',sans-serif; font-size:10px;
+  letter-spacing:3px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.25s; border-radius:2px;
+}
+.j-save-btn:hover { background:rgba(78,205,196,0.07); }
+.j-save-btn.saved { border-color:rgba(78,205,196,0.35); color:var(--success); }
+
+.entry-item { border:1px solid var(--border); margin-bottom:10px; overflow:hidden; border-radius:3px; }
+.entry-head { display:flex; align-items:center; padding:14px 16px; cursor:pointer; gap:12px; }
+.entry-date-label { font-family:'Cinzel',serif; font-size:13px; color:var(--cream); flex:1; }
+.entry-preview { font-size:12px; color:var(--muted2); font-style:italic; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
+.entry-chevron { color:var(--muted); font-size:16px; transition:transform 0.3s; }
+.entry-chevron.open { transform:rotate(90deg); }
+.entry-body { max-height:0; overflow:hidden; transition:max-height 0.4s ease; }
+.entry-body.open { max-height:2000px; }
+.entry-body-inner { padding:0 16px 16px; border-top:1px solid rgba(78,205,196,0.06); }
+.entry-resp { margin-top:14px; }
+.entry-cat { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--teal-dim); margin-bottom:4px; }
+.entry-q { font-size:12px; color:var(--muted2); font-style:italic; margin-bottom:6px; }
+.entry-a { font-family:'Cormorant Garamond',serif; font-size:15px; color:var(--cream); line-height:1.7; white-space:pre-wrap; }
+.del-btn {
+  margin-top:16px; padding:8px 16px;
+  border:1px solid rgba(249,127,163,0.2);
+  background:transparent; color:rgba(249,127,163,0.5);
+  font-family:'Jost',sans-serif; font-size:9px;
+  letter-spacing:2px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.25s; border-radius:2px;
+}
+.del-btn:hover { color:rgba(249,127,163,0.9); border-color:rgba(249,127,163,0.5); }
+
+.empty-state { text-align:center; padding:60px 20px; }
+.empty-icon { font-size:36px; opacity:0.3; margin-bottom:14px; }
+.empty-text { font-size:14px; color:var(--muted); font-style:italic; }
+
+/* ===== FREQUENCIES ===== */
+.freq-grid { padding:16px 16px 80px; display:flex; flex-direction:column; gap:10px; }
+.freq-item {
+  border:1px solid var(--border); padding:16px 18px;
+  display:flex; align-items:center; gap:16px;
+  background:rgba(255,255,255,0.015); transition:all 0.25s; border-radius:3px;
+}
+.freq-hz { font-family:'Cormorant Garamond',serif; font-size:26px; color:var(--teal); min-width:72px; flex-shrink:0; line-height:1; }
+.freq-info { flex:1; }
+.freq-name { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted2); margin-bottom:4px; }
+.freq-desc { font-size:13px; color:var(--cream); line-height:1.5; margin-bottom:4px; }
+.freq-use { font-size:11px; font-style:italic; color:var(--teal-dim); }
+.freq-toggle {
+  width:40px; height:40px; border-radius:50%;
+  border:1px solid var(--border2); background:transparent;
+  color:var(--teal); font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:all 0.25s;
+}
+.freq-toggle:hover { background:rgba(78,205,196,0.1); }
+.freq-toggle.on { background:var(--teal); color:var(--ink); border-color:var(--teal); }
+
+/* ===== TEACHINGS ===== */
+.teachings-tabs {
+  display:flex; border-bottom:1px solid var(--border);
+  background:rgba(10,15,30,0.9); flex-shrink:0;
+}
+.t-tab {
+  flex:1; padding:13px 6px;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted2); text-align:center; cursor:pointer;
+  border:none; background:transparent;
+  border-bottom:2px solid transparent; transition:all 0.25s;
+  font-family:'Jost',sans-serif;
+}
+.t-tab.active { color:var(--teal); border-bottom-color:var(--teal); }
+
+.teachings-content { padding:20px 18px 100px; }
+
+.teaching-card {
+  border:1px solid var(--border); margin-bottom:14px;
+  overflow:hidden; border-radius:4px;
+  background:rgba(255,255,255,0.012);
+  transition:border-color 0.25s;
+}
+.teaching-card:hover { border-color:rgba(78,205,196,0.25); }
+.teaching-head {
+  display:flex; align-items:flex-start; gap:14px;
+  padding:16px 18px; cursor:pointer;
+}
+.teaching-emoji { font-size:24px; flex-shrink:0; }
+.teaching-meta { flex:1; }
+.teaching-tag {
+  font-size:9px; letter-spacing:3px; text-transform:uppercase;
+  color:#8a7ab5; margin-bottom:4px;
+}
+.teaching-title { font-family:'Cinzel',serif; font-size:14px; color:var(--cream); letter-spacing:0.5px; margin-bottom:4px; }
+.teaching-preview { font-size:12px; color:var(--muted2); line-height:1.5; }
+.teaching-chevron { color:var(--muted); font-size:16px; transition:transform 0.3s; flex-shrink:0; padding-top:4px; }
+.teaching-chevron.open { transform:rotate(90deg); }
+.teaching-body { max-height:0; overflow:hidden; transition:max-height 0.5s ease; }
+.teaching-body.open { max-height:1200px; }
+.teaching-inner {
+  padding:0 18px 20px; border-top:1px solid rgba(78,205,196,0.06);
+}
+.teaching-text {
+  font-size:14px; line-height:1.85; color:var(--cream2); margin-top:14px;
+}
+.teaching-steps {
+  margin-top:16px; display:flex; flex-direction:column; gap:10px;
+}
+.teaching-step {
+  display:flex; gap:12px; align-items:flex-start;
+}
+.teaching-step-num {
+  font-family:'Cinzel',serif; font-size:14px; color:var(--teal); min-width:24px; flex-shrink:0;
+}
+.teaching-step-text { font-size:13px; line-height:1.7; color:var(--cream2); }
+
+.breath-timer {
+  margin-top:20px;
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+}
+.breath-circle {
+  width:100px; height:100px; border-radius:50%;
+  border:2px solid var(--teal);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cinzel',serif; font-size:13px; color:var(--teal);
+  letter-spacing:1px;
+  transition:transform 4s ease-in-out, border-color 1s;
+  position:relative;
+}
+.breath-circle.expand { transform:scale(1.4); border-color:var(--teal2); }
+.breath-circle.hold { transform:scale(1.4); border-color:var(--lavender); }
+.breath-circle.exhale { transform:scale(1.0); border-color:var(--teal); }
+.breath-start-btn {
+  padding:10px 28px;
+  border:1px solid var(--border2); background:transparent;
+  color:var(--teal); font-family:'Jost',sans-serif;
+  font-size:10px; letter-spacing:3px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.25s; border-radius:2px;
+}
+.breath-start-btn:hover { background:var(--teal-glow); }
+.breath-phase-label {
+  font-size:11px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--muted2); min-height:20px;
+}
+.breath-counter {
+  font-family:'Cinzel',serif; font-size:22px; color:var(--teal);
+}
+
+/* ===== COMMUNITY ===== */
+.community-content { padding:20px 18px 100px; }
+
+.community-header {
+  margin-bottom:20px;
+}
+.community-heading {
+  font-family:'Cormorant Garamond',serif; font-size:28px;
+  color:var(--cream); margin-bottom:6px;
+}
+.community-subheading { font-size:12px; color:var(--muted2); line-height:1.6; }
+
+.class-card {
+  border:1px solid var(--border); margin-bottom:14px;
+  padding:18px 20px; border-radius:4px;
+  background:rgba(255,255,255,0.012);
+  transition:all 0.25s;
+}
+.class-card:hover { border-color:rgba(78,205,196,0.25); }
+.class-card-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+.class-avatar {
+  width:42px; height:42px; border-radius:50%;
+  background:var(--teal-glow); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0;
+}
+.class-info { flex:1; }
+.class-name { font-family:'Cinzel',serif; font-size:14px; color:var(--cream); letter-spacing:0.5px; margin-bottom:3px; }
+.class-host { font-size:11px; color:var(--muted2); }
+.class-host span { color:var(--teal); }
+.class-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.class-tag {
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  padding:3px 8px; border:1px solid; border-radius:20px;
+}
+.class-tag.meditation { color:#8a7ab5; border-color:#8a7ab5; }
+.class-tag.breathwork { color:#7a9e7e; border-color:#7a9e7e; }
+.class-tag.affirmation { color:#c4845a; border-color:#c4845a; }
+.class-desc { font-size:13px; color:var(--muted2); line-height:1.6; margin:10px 0 12px; }
+.class-meta { display:flex; gap:16px; align-items:center; }
+.class-meta-item { font-size:11px; color:var(--muted); letter-spacing:1px; }
+.class-meta-item span { color:var(--cream2); }
+.class-join-btn {
+  padding:9px 20px;
+  background:var(--teal); border:none;
+  color:var(--ink); font-family:'Jost',sans-serif;
+  font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  cursor:pointer; border-radius:2px; transition:all 0.25s;
+  margin-left:auto; font-weight:500;
+}
+.class-join-btn:hover { background:var(--teal2); }
+.class-join-btn.joined { background:transparent; border:1px solid var(--border2); color:var(--muted2); }
+
+.create-class-btn {
+  width:100%; padding:16px;
+  border:1px dashed rgba(78,205,196,0.25);
+  background:rgba(78,205,196,0.02);
+  color:var(--teal); font-family:'Jost',sans-serif;
+  font-size:11px; letter-spacing:3px; text-transform:uppercase;
+  cursor:pointer; border-radius:4px; transition:all 0.25s;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-bottom:20px;
+}
+.create-class-btn:hover { background:var(--teal-glow); border-style:solid; }
+
+/* Create class modal */
+.modal-overlay {
+  position:fixed; inset:0; z-index:300;
+  background:rgba(10,15,30,0.95);
+  backdrop-filter:blur(8px);
+  display:flex; align-items:flex-end;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.modal-overlay.show { opacity:1; pointer-events:all; }
+.modal-sheet {
+  width:100%; padding:28px 24px 40px;
+  background:var(--panel);
+  border-top:1px solid var(--border2);
+  border-radius:16px 16px 0 0;
+  transform:translateY(100%);
+  transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.modal-overlay.show .modal-sheet { transform:translateY(0); }
+.modal-title { font-family:'Cinzel',serif; font-size:18px; color:var(--cream); margin-bottom:6px; }
+.modal-sub { font-size:12px; color:var(--muted2); margin-bottom:24px; }
+.modal-form { display:flex; flex-direction:column; gap:12px; }
+.modal-input {
+  width:100%; padding:13px 16px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border); color:var(--cream);
+  font-family:'Jost',sans-serif; font-size:15px; font-weight:300;
+  outline:none; transition:border-color 0.25s; border-radius:2px;
+  -webkit-appearance:none;
+}
+.modal-input:focus { border-color:var(--border2); }
+.modal-input::placeholder { color:var(--muted); }
+.modal-select {
+  width:100%; padding:13px 16px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border); color:var(--cream);
+  font-family:'Jost',sans-serif; font-size:14px;
+  outline:none; border-radius:2px;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.modal-select option { background:var(--panel); }
+.modal-row { display:flex; gap:10px; }
+.modal-row .modal-input { flex:1; }
+.modal-submit {
+  width:100%; padding:14px;
+  background:var(--teal); border:none;
+  color:var(--ink); font-family:'Cinzel',serif;
+  font-size:12px; letter-spacing:3px;
+  cursor:pointer; border-radius:2px; transition:all 0.25s;
+  font-weight:600;
+}
+.modal-submit:hover { background:var(--teal2); }
+.modal-cancel {
+  width:100%; padding:12px;
+  border:none; background:transparent;
+  color:var(--muted2); font-family:'Jost',sans-serif;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  cursor:pointer; transition:color 0.2s;
+}
+.modal-cancel:hover { color:var(--cream); }
+
+/* Community posts */
+.post-card {
+  border:1px solid var(--border); margin-bottom:12px;
+  padding:16px 18px; border-radius:4px;
+  background:rgba(255,255,255,0.01);
+}
+.post-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.post-avatar {
+  width:34px; height:34px; border-radius:50%;
+  background:var(--teal-glow); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:14px;
+}
+.post-author { font-size:13px; color:var(--cream); font-weight:400; }
+.post-time { font-size:10px; color:var(--muted); margin-top:2px; }
+.post-text { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--cream2); line-height:1.7; }
+.post-actions { display:flex; gap:16px; margin-top:12px; }
+.post-action {
+  background:none; border:none;
+  color:var(--muted2); font-size:12px; letter-spacing:1px;
+  cursor:pointer; transition:color 0.2s; font-family:'Jost',sans-serif;
+  display:flex; align-items:center; gap:5px; padding:0;
+}
+.post-action:hover { color:var(--teal); }
+.post-action.liked { color:var(--teal); }
+
+/* Community tabs */
+.community-tabs {
+  display:flex; border-bottom:1px solid var(--border);
+  background:rgba(10,15,30,0.9); flex-shrink:0;
+}
+.c-tab {
+  flex:1; padding:13px 6px;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted2); text-align:center; cursor:pointer;
+  border:none; background:transparent;
+  border-bottom:2px solid transparent; transition:all 0.25s;
+  font-family:'Jost',sans-serif;
+}
+.c-tab.active { color:var(--teal); border-bottom-color:var(--teal); }
+
+/* ===== SETTINGS ===== */
+.settings-content { padding:20px 18px 80px; }
+.settings-section { margin-bottom:28px; }
+.settings-label {
+  font-size:9px; letter-spacing:4px; text-transform:uppercase;
+  color:var(--teal); padding-bottom:10px;
+  border-bottom:1px solid var(--border); margin-bottom:14px;
+}
+.voice-list { display:flex; flex-direction:column; gap:6px; }
+.voice-row {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border:1px solid var(--border);
+  cursor:pointer; transition:all 0.25s;
+  background:transparent; width:100%; text-align:left;
+  color:var(--muted2); font-family:'Jost',sans-serif;
+  font-size:12px; border-radius:2px;
+}
+.voice-row:hover { border-color:var(--border2); color:var(--cream); }
+.voice-row.selected { border-color:var(--teal); color:var(--teal); background:rgba(78,205,196,0.06); }
+.voice-row .vr-dot { font-size:8px; flex-shrink:0; }
+.voice-row .vr-name { flex:1; }
+.voice-row .vr-lang { font-size:10px; opacity:0.5; }
+.speed-row { display:flex; align-items:center; gap:12px; margin-top:4px; }
+.speed-label { font-size:11px; color:var(--muted2); min-width:48px; }
+input[type=range] {
+  flex:1; -webkit-appearance:none; height:2px;
+  background:rgba(78,205,196,0.2); outline:none; border-radius:2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:18px; height:18px;
+  border-radius:50%; background:var(--teal); cursor:pointer;
+}
+.speed-val { font-family:'Cinzel',serif; font-size:13px; color:var(--teal); min-width:38px; text-align:right; }
+.test-btn {
+  width:100%; padding:13px; border:1px solid var(--border2);
+  background:rgba(78,205,196,0.04); color:var(--cream);
+  font-family:'Jost',sans-serif; font-size:10px;
+  letter-spacing:3px; text-transform:uppercase;
+  cursor:pointer; transition:all 0.25s; margin-top:4px; border-radius:2px;
+}
+.test-btn:hover { background:rgba(78,205,196,0.1); }
+.settings-note { font-size:12px; color:var(--muted); line-height:1.6; font-style:italic; margin-top:10px; }
+
+/* ===== COMPLETION ===== */
+.completion {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(10,15,30,0.97);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:40px; text-align:center;
+  opacity:0; pointer-events:none; transition:opacity 0.5s ease;
+}
+.completion.show { opacity:1; pointer-events:all; }
+.completion-glyph { font-size:52px; margin-bottom:24px; animation:breathe 3s ease-in-out infinite; }
+.completion-title {
+  font-family:'Cormorant Garamond',serif; font-size:36px;
+  color:var(--teal2); font-style:italic; margin-bottom:16px;
+}
+.completion-msg { font-size:16px; color:var(--muted2); line-height:1.8; max-width:300px; margin-bottom:36px; font-style:italic; }
+.completion-btn {
+  padding:14px 36px; border:1px solid var(--teal);
+  background:transparent; color:var(--teal);
+  font-family:'Cinzel',serif; font-size:12px;
+  letter-spacing:3px; cursor:pointer; transition:all 0.25s; border-radius:2px;
+}
+.completion-btn:hover { background:var(--teal-glow); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { animation:fadeUp 0.4s ease forwards; }
+@keyframes breathe { 0%,100%{transform:scale(1);opacity:0.9} 50%{transform:scale(1.06);opacity:1} }
+
+/* Category colors — earth tones */
+.cat-abundance { color:#c9a84c; border-color:#c9a84c; }
+.cat-gratitude { color:#7a9e7e; border-color:#7a9e7e; }
+.cat-ascension { color:#8a7ab5; border-color:#8a7ab5; }
+.cat-growth { color:#c4845a; border-color:#c4845a; }
+
+/* NAV BAR bottom */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--panel2);
+  border-top:1px solid var(--border);
+  display:flex; z-index:50;
+  padding:0 0 env(safe-area-inset-bottom);
+  backdrop-filter:blur(12px);
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:10px 4px 8px;
+  cursor:pointer; background:none; border:none;
+  color:var(--muted); transition:color 0.2s;
+  gap:4px; font-family:'Jost',sans-serif;
+}
+.nav-item.active { color:var(--teal); }
+.nav-item-icon { font-size:20px; line-height:1; }
+.nav-item-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; }
+
+/* profile chip on home */
+.profile-chip {
+  position:absolute; top:16px; right:16px;
+  width:32px; height:32px; border-radius:50%;
+  background:var(--teal-glow); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; cursor:pointer; transition:all 0.25s;
+}
+.profile-chip:hover { background:rgba(78,205,196,0.2); }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="auth">
+  <div class="auth-glyph">✦</div>
+  <div class="auth-logo">ALIGNED</div>
+  <div class="auth-tagline">Sacred Daily Practice</div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-signin" onclick="authTab('signin')">Sign In</button>
+    <button class="auth-tab" id="tab-signup" onclick="authTab('signup')">Create Account</button>
+  </div>
+  <div class="auth-form" id="authForm">
+    <input class="auth-input" id="authName" type="text" placeholder="Your name" style="display:none">
+    <input class="auth-input" id="authEmail" type="email" placeholder="Email address" autocomplete="email">
+    <input class="auth-input" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+    <div class="auth-error" id="authError"></div>
+    <button class="auth-submit" id="authSubmit" onclick="handleAuth()">Sign In</button>
+  </div>
+  <div class="auth-divider">or</div>
+  <button class="auth-guest-btn" onclick="enterAsGuest()">Continue as Guest</button>
+</div>
+
+<!-- ===== MAIN APP (hidden until authed) ===== -->
+<div id="mainApp" style="display:none;position:absolute;inset:0;">
+
+  <!-- HOME -->
+  <div class="screen active" id="home">
+    <div class="home-hero">
+      <div class="home-eyebrow">Daily Sacred Practice</div>
+      <div class="home-name"><em>Aligned</em></div>
+      <div class="home-username" id="homeUsername"></div>
+      <div class="home-date" id="homeDate"></div>
+      <div class="profile-chip" onclick="showProfileMenu()">😊</div>
+    </div>
+
+    <!-- 7-Day Tracker Strip -->
+    <div class="tracker-strip">
+      <div class="tracker-strip-title">⚡ Active Streak — <span id="streakDisplay">0 Days</span></div>
+      <div class="tracker-days" id="trackerDays"></div>
+    </div>
+
+    <!-- Streak ring + chakra dots -->
+    <div class="streak-wrap">
+      <div class="ring-container">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="48" fill="none" stroke="rgba(122,158,126,0.1)" stroke-width="4"/>
+          <circle cx="55" cy="55" r="48" fill="none" stroke="url(#tealGrad)" stroke-width="4"
+            stroke-dasharray="301" id="streakArc" stroke-dashoffset="301" stroke-linecap="round"
+            style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"/>
+          <defs>
+            <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#3a5c3c"/>
+              <stop offset="100%" stop-color="#7a9e7e"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-number" id="streakNum">0</div>
+          <div class="ring-word">Day Streak</div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="ch-label">Today's Chakras</div>
+        <div class="chakra-row" id="chakraDots"></div>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-card" onclick="startRitual('morning')">
+        <div class="mc-icon">☀️</div>
+        <div class="mc-body">
+          <div class="mc-title">Morning Ritual</div>
+          <div class="mc-sub">Movement · Breathwork · All 7 Affirmations · Gratitude</div>
+        </div>
+        <div class="mc-arrow">›</div>
+      </div>
+      <div class="menu-card" onclick="startRitual('night')">
+        <div class="mc-icon">🌙</div>
+        <div class="mc-body">
+          <div class="mc-title">Night Ritual</div>
+          <div class="mc-sub">Release · All 7 Affirmations · Reflection · Sleep</div>
+        </div>
+        <div class="mc-arrow">›</div>
+      </div>
+      <div class="menu-card" onclick="startRitual('affirm')">
+        <div class="mc-icon">✦</div>
+        <div class="mc-body">
+          <div class="mc-title">Affirmations Only</div>
+          <div class="mc-sub">All seven chakras · Voice readback</div>
+        </div>
+        <div class="mc-arrow">›</div>
+      </div>
+      <div class="menu-divider"></div>
+      <button class="ghost-btn" onclick="navTo('journal')">✍&nbsp;&nbsp;Journal</button>
+      <button class="ghost-btn" onclick="navTo('teachings')">📖&nbsp;&nbsp;Teachings &amp; Breathwork</button>
+      <button class="ghost-btn" onclick="navTo('frequencies')">♪&nbsp;&nbsp;Frequency Library</button>
+      <button class="ghost-btn" onclick="navTo('community')">🌐&nbsp;&nbsp;Community</button>
+      <button class="ghost-btn" onclick="navTo('settings')">⚙&nbsp;&nbsp;Voice Settings</button>
+    </div>
+    <div class="home-signout">
+      <button class="signout-btn" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- RITUAL -->
+  <div class="screen" id="ritual">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="goHome()">‹</button>
+      <div class="top-bar-title">
+        <span class="label" id="ritualLabel">Morning Ritual</span>
+        <span class="title" id="ritualTitle">Begin</span>
+      </div>
+      <button class="icon-btn muted" onclick="navTo('settings')">⚙</button>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+    <div class="scroll-body">
+      <div class="steps-list" id="stepsList"></div>
+    </div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="screen" id="journal">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="navTo('home')">‹</button>
+      <div class="top-bar-title">
+        <span class="label">Inner Work</span>
+        <span class="title">Journal</span>
+      </div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="journal-tabs">
+      <button class="j-tab active" id="jtab-today" onclick="jTab('today')">Today</button>
+      <button class="j-tab" id="jtab-past" onclick="jTab('past')">Past Entries</button>
+    </div>
+    <div class="scroll-body">
+      <div class="journal-content" id="journalContent"></div>
+    </div>
+  </div>
+
+  <!-- TEACHINGS -->
+  <div class="screen" id="teachings">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="navTo('home')">‹</button>
+      <div class="top-bar-title">
+        <span class="label">Learn &amp; Practice</span>
+        <span class="title">Teachings</span>
+      </div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="teachings-tabs">
+      <button class="t-tab active" id="ttab-meditation" onclick="teachTab('meditation')">Meditation</button>
+      <button class="t-tab" id="ttab-breathwork" onclick="teachTab('breathwork')">Breathwork</button>
+    </div>
+    <div class="scroll-body">
+      <div class="teachings-content" id="teachingsContent"></div>
+    </div>
+  </div>
+
+  <!-- FREQUENCIES -->
+  <div class="screen" id="frequencies">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="navTo('home')">‹</button>
+      <div class="top-bar-title">
+        <span class="label">Sound Healing</span>
+        <span class="title">Frequencies</span>
+      </div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="scroll-body">
+      <div class="freq-grid" id="freqGrid"></div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY -->
+  <div class="screen" id="community">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="navTo('home')">‹</button>
+      <div class="top-bar-title">
+        <span class="label">Connect &amp; Grow</span>
+        <span class="title">Community</span>
+      </div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="community-tabs">
+      <button class="c-tab active" id="ctab-classes" onclick="commTab('classes')">Classes</button>
+      <button class="c-tab" id="ctab-feed" onclick="commTab('feed')">Feed</button>
+    </div>
+    <div class="scroll-body">
+      <div class="community-content" id="communityContent"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="screen" id="settings">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="navTo('home')">‹</button>
+      <div class="top-bar-title">
+        <span class="label">Preferences</span>
+        <span class="title">Voice Settings</span>
+      </div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="scroll-body">
+      <div class="settings-content" id="settingsContent"></div>
+    </div>
+  </div>
+
+</div><!-- end mainApp -->
+</div><!-- end #app -->
+
+<!-- Floating audio bar -->
+<div class="audio-bar" id="audioBar">
+  <div class="audio-bar-inner">
+    <div class="wave-indicator">
+      <div class="wave-b" style="--d:0.6s;--delay:0s"></div>
+      <div class="wave-b" style="--d:0.8s;--delay:0.12s"></div>
+      <div class="wave-b" style="--d:0.7s;--delay:0.24s"></div>
+      <div class="wave-b" style="--d:0.9s;--delay:0.08s"></div>
+    </div>
+    <div class="audio-bar-info">
+      <div class="audio-bar-title" id="abTitle">Playing</div>
+      <div class="audio-bar-sub" id="abSub"></div>
+    </div>
+    <div class="audio-bar-controls">
+      <button class="ab-btn" id="abPause" onclick="togglePause()">⏸</button>
+      <button class="ab-btn stop" onclick="stopAll()">■</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Class Modal -->
+<div class="modal-overlay" id="createClassModal">
+  <div class="modal-sheet">
+    <div class="modal-title">Start a Class</div>
+    <div class="modal-sub">Share your practice with the community</div>
+    <div class="modal-form">
+      <input class="modal-input" id="className" placeholder="Class name (e.g. Morning Flow with Sarah)" type="text">
+      <input class="modal-input" id="classDesc" placeholder="What will you explore together?" type="text">
+      <select class="modal-select" id="classType">
+        <option value="meditation">Meditation</option>
+        <option value="breathwork">Breathwork</option>
+        <option value="affirmation">Affirmations</option>
+        <option value="mixed">Mixed Practice</option>
+      </select>
+      <div class="modal-row">
+        <input class="modal-input" id="classDay" placeholder="Day (e.g. Mon/Wed)" type="text">
+        <input class="modal-input" id="classTime" placeholder="Time (e.g. 7 AM EST)" type="text">
+      </div>
+      <button class="modal-submit" onclick="submitClass()">Create Class</button>
+      <button class="modal-cancel" onclick="closeClassModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Completion -->
+<div class="completion" id="completion">
+  <div class="completion-glyph">✦</div>
+  <div class="completion-title">Aligned.</div>
+  <div class="completion-msg" id="completionMsg"></div>
+  <button class="completion-btn" onclick="closeCompletion()">Return Home</button>
+</div>
+
+<script>
+// ===== CONSTANTS =====
+const CHAKRAS = [
+  {id:'root',   color:'#c0543a', word:'I Am',         label:'Root',         sub:'Stability'},
+  {id:'sacral', color:'#c4845a', word:'I Feel',       label:'Sacral',       sub:'Creation'},
+  {id:'solar',  color:'#c9a84c', word:'I Do',         label:'Solar Plexus', sub:'Power'},
+  {id:'heart',  color:'#7a9e7e', word:'I Love',       label:'Heart',        sub:'Connection'},
+  {id:'throat', color:'#5a8fa3', word:'I Speak',      label:'Throat',       sub:'Truth'},
+  {id:'third',  color:'#8a7ab5', word:'I See',        label:'Third Eye',    sub:'Vision'},
+  {id:'crown',  color:'#a889c4', word:'I Understand', label:'Crown',        sub:'Divinity'},
+];
+
+const AFFIRMATIONS = [
+  {opener:'I am',         body:'a magnet for abundance, wealth, and everything I have ever dreamed of. I am the first in my lineage to reach this level and I carry everyone behind me with pride. I am powerful beyond what I have yet seen in myself.'},
+  {opener:'I feel',       body:'the frequency of my dream life as if it is already here. I feel free. I feel whole. I feel the joy of a life fully lived on my own terms and I let that feeling lead me.'},
+  {opener:'I do',         body:'what my highest self would do, every single day. I do the hard things, the aligned things, the things that compound into a life others only imagine. I do it for myself, for the people I love, and for the people I have not yet had the chance to help.'},
+  {opener:'I love',       body:'my life. I love who I am becoming. I love that I was built for this and that nothing has broken me. I love deeply, I give generously, and I receive without guilt because I know I am worthy of every blessing coming my way.'},
+  {opener:'I speak',      body:'my future into existence. My words carry weight. My voice is a tool for my elevation and for the elevation of everyone around me. What I say, I create.'},
+  {opener:'I see',        body:'my dream life with perfect clarity. I see the freedom, the wealth, the impact, the joy, the people I will lift along the way. I see it and I know it is not a fantasy. It is a destination I am already walking toward.'},
+  {opener:'I understand', body:'that I was not put here to be ordinary. I understand that wealth, happiness, and freedom are my birthright. I understand that every morning I say these words I am choosing my highest self over fear, over doubt, over limitation. I understand that I am already becoming the person my future self is proud of.'},
+];
+
+const FREQS = [
+  {hz:528,  label:'Miracle Tone',    desc:'DNA repair, transformation, love frequency, manifestation.',             use:'During affirmations',   type:'tone'},
+  {hz:432,  label:'Natural Tuning',  desc:'Earth resonance, nervous system harmony, deep grounding.',              use:'During movement',        type:'tone'},
+  {hz:396,  label:'Liberation',      desc:'Releases fear, guilt, and blocks around worthiness.',                   use:'During breathwork',      type:'tone'},
+  {hz:417,  label:'Transmutation',   desc:'Releasing negative energy, clearing old patterns, facilitating change.',use:'During meditation',      type:'tone'},
+  {hz:639,  label:'Heart Opening',   desc:'Harmonizes relationships, deepens empathy, heart chakra activation.',   use:'During heart affirmation',type:'tone'},
+  {hz:741,  label:'Clarity',         desc:'Problem solving, self-expression, throat chakra activation.',           use:'During journaling',      type:'tone'},
+  {hz:852,  label:'Third Eye',       desc:'Awakens intuition, deepens spiritual insight, pineal activation.',      use:'During visualization',   type:'tone'},
+  {hz:963,  label:'Crown Activation',desc:'Connection to higher consciousness, pure divine frequency.',            use:'During crown affirmation',type:'tone'},
+  {hz:174,  label:'Deep Rest',       desc:'Signals safety and deep calm to your nervous system.',                  use:'Night wind down',        type:'tone'},
+  {hz:40,   label:'Gamma Waves',     desc:'Peak focus, high cognition, heightened awareness, flow state.',         use:'Morning meditation',     type:'binaural', carrier:200, beat:40},
+  {hz:10,   label:'Alpha Waves',     desc:'Calm alertness, relaxed focus, creative flow, light meditation.',       use:'Journaling or reading',  type:'binaural', carrier:200, beat:10},
+  {hz:6,    label:'Theta Waves',     desc:'Deep meditation, subconscious access, creative insight.',               use:'Deep meditation',        type:'binaural', carrier:200, beat:6},
+  {hz:2,    label:'Delta Waves',     desc:'Deep restorative sleep, cellular repair, subconscious reprogramming.', use:'While sleeping',         type:'binaural', carrier:100, beat:2},
+];
+
+const JOURNAL_PROMPTS = [
+  {cat:'Abundance',  cls:'cat-abundance', q:'Where in my life am I still thinking small? What would I ask for if I knew the answer would be yes?'},
+  {cat:'Abundance',  cls:'cat-abundance', q:'What does my dream financial life look like in specific, tangible detail? Describe a regular Thursday in that life.'},
+  {cat:'Gratitude',  cls:'cat-gratitude', q:'What is one thing happening right now, in the waiting or in the having, that I genuinely appreciate when I slow down enough to see it?'},
+  {cat:'Gratitude',  cls:'cat-gratitude', q:'Who is one person in my corner right now? What have they done or said recently that I have not fully acknowledged?'},
+  {cat:'Ascension',  cls:'cat-ascension', q:'What belief am I holding onto that my highest self would release today? What is it costing me to keep it?'},
+  {cat:'Ascension',  cls:'cat-ascension', q:'Describe the most elevated version of yourself in the present tense. What does that person think, feel, and do on a daily basis?'},
+  {cat:'Growth',     cls:'cat-growth',    q:'What is the one move I could make this week that would compound over time more than anything else I could do?'},
+  {cat:'Growth',     cls:'cat-growth',    q:'What did I do recently that proved I am capable of the life I am building? What did I learn from it?'},
+];
+
+const MORNING_STEPS = [
+  {num:'01', name:'Movement',     chakraIdx:null, freqHz:432, detail:'10 to 15 minutes. Walk, stretch, lift. Wake the body before you work the mind.',
+   voice:'Time to move. Even 10 minutes changes everything. Get your blood flowing. Shake off the night. Your body is the vessel for everything you are about to declare. Honor it.'},
+  {num:'02', name:'Breathwork',   chakraIdx:null, freqHz:396, detail:'4 to 6 rounds of box breathing. Inhale 4. Hold 4. Exhale 4. Hold 4. Transition into presence.',
+   voice:'Close your eyes. Breathe in slowly for four counts. Hold for four. Exhale for four. Hold for four. Repeat this four to six times. Let each breath release what no longer serves you and open you to what is coming.'},
+  {num:'03', name:'I Am',         chakraIdx:0,    freqHz:528, voice:'I am '+AFFIRMATIONS[0].body},
+  {num:'04', name:'I Feel',       chakraIdx:1,    freqHz:528, voice:'I feel '+AFFIRMATIONS[1].body},
+  {num:'05', name:'I Do',         chakraIdx:2,    freqHz:528, voice:'I do '+AFFIRMATIONS[2].body},
+  {num:'06', name:'I Love',       chakraIdx:3,    freqHz:639, voice:'I love '+AFFIRMATIONS[3].body},
+  {num:'07', name:'I Speak',      chakraIdx:4,    freqHz:741, voice:'I speak '+AFFIRMATIONS[4].body},
+  {num:'08', name:'I See',        chakraIdx:5,    freqHz:852, voice:'I see '+AFFIRMATIONS[5].body},
+  {num:'09', name:'I Understand', chakraIdx:6,    freqHz:963, voice:'I understand '+AFFIRMATIONS[6].body},
+  {num:'10', name:'Meditation',   chakraIdx:null, freqHz:40,  detail:'5 to 10 minutes of stillness. Let the affirmations settle. No thinking. Just receiving.',
+   voice:'Sit with what you just declared. No thinking. Just receiving. Let the words you spoke settle into your body. You are not waiting for your life to begin. It is already unfolding.'},
+  {num:'11', name:'Gratitude',    chakraIdx:null, freqHz:528, detail:'Say three specific things out loud. Name the person, the moment, the detail.',
+   voice:'Now anchor everything in gratitude. What one specific thing are you grateful for right now, in detail? Who is one person actively in your corner? What is one thing about where you are right now that you can find appreciation for? Speak your answers out loud.'},
+];
+
+const NIGHT_STEPS = [
+  {num:'01', name:'Phone Down',       chakraIdx:null, freqHz:174, detail:'Put the phone down. The last thing your subconscious absorbs before sleep becomes tomorrow\'s lens.',
+   voice:'Put the phone down. You have done enough today. The last thing your subconscious absorbs before sleep becomes the lens for tomorrow. Protect this window.'},
+  {num:'02', name:'Breathwork',       chakraIdx:null, freqHz:174, detail:'4 to 6 rounds of box breathing. Tonight this is about releasing, not activating.',
+   voice:'Breathe in for four counts. Hold for four. Exhale for four. Hold for four. Tonight you are releasing. Let the day go. Let the outcomes go. Let the waiting go. You did your part.'},
+  {num:'03', name:'I Am',             chakraIdx:0,    freqHz:528, voice:'I am '+AFFIRMATIONS[0].body},
+  {num:'04', name:'I Feel',           chakraIdx:1,    freqHz:528, voice:'I feel '+AFFIRMATIONS[1].body},
+  {num:'05', name:'I Do',             chakraIdx:2,    freqHz:528, voice:'I do '+AFFIRMATIONS[2].body},
+  {num:'06', name:'I Love',           chakraIdx:3,    freqHz:639, voice:'I love '+AFFIRMATIONS[3].body},
+  {num:'07', name:'I Speak',          chakraIdx:4,    freqHz:741, voice:'I speak '+AFFIRMATIONS[4].body},
+  {num:'08', name:'I See',            chakraIdx:5,    freqHz:852, voice:'I see '+AFFIRMATIONS[5].body},
+  {num:'09', name:'I Understand',     chakraIdx:6,    freqHz:963, voice:'I understand '+AFFIRMATIONS[6].body},
+  {num:'10', name:'Reflection',       chakraIdx:null, freqHz:174, detail:'What did you do today your highest self would be proud of? Even one small thing.',
+   voice:'End your day in gratitude. What are you specifically grateful for tonight? Who was in your corner today? What about today can you appreciate, even in the waiting? And what is one thing you did today your highest self would be proud of? Close on a win.'},
+  {num:'11', name:'Sleep — Delta',    chakraIdx:null, freqHz:2,   detail:'Delta binaural beats at low volume as you fall asleep. Headphones recommended.',
+   voice:'You have done the work. You have spoken your truth. Now rest. Let your subconscious carry everything you declared tonight into tomorrow. You are already becoming who you are meant to be. Sleep well.'},
+];
+
+const AFFIRM_ONLY = MORNING_STEPS.filter(s=>s.chakraIdx!==null);
+
+const MEDITATION_TEACHINGS = [
+  {
+    emoji:'🧘',
+    tag:'Foundation',
+    title:'What Is Meditation?',
+    preview:'The most misunderstood practice. You are not trying to empty your mind.',
+    text:`Meditation is not about stopping your thoughts. It is about changing your relationship with them. When a thought arises, you observe it without attaching to it. That gap, between stimulus and response, is where your power lives.\n\nThe practice is simple: sit, focus on your breath, and when your mind wanders, gently bring it back. Each time you return, you are building the muscle of presence. There is no failing. Wandering and returning is the practice.`,
+    steps:[
+      {num:'1', text:'Find a comfortable seat. Spine tall, shoulders relaxed, hands resting on your thighs.'},
+      {num:'2', text:'Set a timer for 5 to 10 minutes. This removes the urge to check.'},
+      {num:'3', text:'Close your eyes. Take three deep breaths to arrive.'},
+      {num:'4', text:'Breathe naturally. Focus on the sensation of air entering and leaving your nose.'},
+      {num:'5', text:'When your mind wanders, notice it without judgment, then return to the breath.'},
+    ]
+  },
+  {
+    emoji:'🌊',
+    tag:'Technique',
+    title:'Body Scan Meditation',
+    preview:'Release tension you did not know you were holding.',
+    text:`The body stores everything. Tension, memory, emotion. The body scan is a systematic practice of bringing awareness to each part of your body in sequence, releasing what does not belong.\n\nStart at the crown of the head and move slowly downward. At each area, simply notice what is there. Tension? Warmth? Numbness? You are not trying to change anything. Awareness alone releases.`,
+    steps:[
+      {num:'1', text:'Lie down or sit comfortably. Close your eyes.'},
+      {num:'2', text:'Begin at the top of your head. Simply notice any sensation.'},
+      {num:'3', text:'Slowly move awareness down: forehead, jaw, neck, shoulders, chest.'},
+      {num:'4', text:'Continue through your arms, belly, lower back, hips, legs, feet.'},
+      {num:'5', text:'At any point of tension, breathe into it. Let your exhale carry it away.'},
+    ]
+  },
+  {
+    emoji:'💫',
+    tag:'Visualization',
+    title:'Future Self Meditation',
+    preview:'Meet the version of you who already has what you are building toward.',
+    text:`Visualization is not wishful thinking. It is neurological rehearsal. When you vividly imagine your future, your brain begins laying down the neural pathways for that reality. Athletes do this before every performance. You can do it before every day.\n\nThe key is specificity and emotion. Do not just see your future. Feel it. What does your body feel like when you are living that life? That feeling is the frequency that attracts it.`,
+    steps:[
+      {num:'1', text:'Close your eyes. Take five deep breaths and soften your body.'},
+      {num:'2', text:'Imagine yourself five years from now. Where do you wake up?'},
+      {num:'3', text:'Walk through a regular morning in that life. What do you see, hear, smell?'},
+      {num:'4', text:'Feel the emotions: peace, pride, freedom, love. Let them fill your body.'},
+      {num:'5', text:'Sit in that feeling for three to five minutes. Then open your eyes and write one thing you are going to do today toward that vision.'},
+    ]
+  },
+  {
+    emoji:'🌿',
+    tag:'Grounding',
+    title:'5-4-3-2-1 Presence Practice',
+    preview:'Come back to your body in 60 seconds.',
+    text:`When anxiety spikes or your mind races, this technique uses your senses to anchor you in the present moment. It is fast, it is science-backed, and it works anywhere, anytime.\n\nThe practice engages your prefrontal cortex, the rational brain, which quiets the amygdala's alarm response. Five breaths, five senses, full reset.`,
+    steps:[
+      {num:'5', text:'Name 5 things you can SEE right now. Look around slowly and say each one silently.'},
+      {num:'4', text:'Name 4 things you can TOUCH. Notice the texture, temperature, pressure.'},
+      {num:'3', text:'Name 3 things you can HEAR. Even distant or background sounds.'},
+      {num:'2', text:'Name 2 things you can SMELL. Or remember two scents you love.'},
+      {num:'1', text:'Name 1 thing you can TASTE. Then take one long, slow breath. Welcome back.'},
+    ]
+  },
+];
+
+const BREATHWORK_TEACHINGS = [
+  {
+    emoji:'📦',
+    tag:'Foundational',
+    title:'Box Breathing',
+    preview:'Used by Navy SEALs to regulate the nervous system under pressure.',
+    text:`Box breathing, also called square breathing, is one of the most effective tools for activating the parasympathetic nervous system quickly. The equal counts create balance between inhale and exhale, reducing cortisol and bringing you into a calm, alert state.\n\nThis is the breath at the core of your ritual. Master this and you have a tool for any moment of stress, decision-making, or performance.`,
+    steps:[
+      {num:'1', text:'Inhale through your nose for 4 counts. Feel your belly expand first, then your chest.'},
+      {num:'2', text:'Hold your breath for 4 counts. Keep your body soft, no gripping.'},
+      {num:'3', text:'Exhale slowly through your mouth for 4 counts. Empty completely.'},
+      {num:'4', text:'Hold empty for 4 counts. Stay relaxed.'},
+      {num:'5', text:'Repeat 4 to 6 rounds. That is your box. 4-4-4-4.'},
+    ],
+    hasTimer: true,
+    timerPattern: [{phase:'Inhale', duration:4000}, {phase:'Hold', duration:4000}, {phase:'Exhale', duration:4000}, {phase:'Hold', duration:4000}]
+  },
+  {
+    emoji:'🔥',
+    tag:'Energizing',
+    title:'Breath of Fire',
+    preview:'Rapid nasal breathing that activates your energy and clears the mind.',
+    text:`Breath of Fire is a rhythmic, rapid breathing technique from Kundalini yoga. The exhale is active and forceful, the inhale is passive. Done for one to three minutes, it increases energy, clears mental fog, and activates the solar plexus, your center of personal power.\n\nStart slowly, 1 breath per second, and build from there. This is not hyperventilation. Keep it rhythmic and controlled.`,
+    steps:[
+      {num:'1', text:'Sit tall. Place one hand on your belly.'},
+      {num:'2', text:'Take a deep breath in to prepare.'},
+      {num:'3', text:'Begin rapid nasal breathing: short, forceful exhales through the nose, passive inhales.'},
+      {num:'4', text:'Your belly pumps in on each exhale, out on each inhale.'},
+      {num:'5', text:'Continue for 30 seconds to 2 minutes. Then take a full inhale, hold 10-15 seconds, release slowly. Sit and feel the result.'},
+    ]
+  },
+  {
+    emoji:'🌙',
+    tag:'Calming',
+    title:'4-7-8 Sleep Breath',
+    preview:'The physiological sedative. Fall asleep faster.',
+    text:`The 4-7-8 technique, developed by Dr. Andrew Weil, is sometimes called a natural tranquilizer. The extended exhale triggers the vagus nerve and activates your rest-and-digest response. Three rounds is often enough to feel the shift. Six rounds can produce noticeable drowsiness.\n\nThis is the breath for your night ritual, for anxious moments, and for any time you need to downshift quickly.`,
+    steps:[
+      {num:'1', text:'Exhale completely through your mouth to begin empty.'},
+      {num:'2', text:'Close your mouth and inhale quietly through your nose for 4 counts.'},
+      {num:'3', text:'Hold your breath for 7 counts.'},
+      {num:'4', text:'Exhale completely through your mouth for 8 counts. You can make a whooshing sound.'},
+      {num:'5', text:'Repeat 3 to 6 rounds. Do not do more than 4 rounds in your first week.'},
+    ],
+    hasTimer: true,
+    timerPattern: [{phase:'Inhale', duration:4000}, {phase:'Hold', duration:7000}, {phase:'Exhale', duration:8000}]
+  },
+  {
+    emoji:'⚡',
+    tag:'Advanced',
+    title:'Wim Hof Method',
+    preview:'Controlled hyperventilation followed by breath retention. Transformative.',
+    text:`The Wim Hof Method is backed by peer-reviewed research and has been shown to reduce inflammation, boost immunity, and produce measurable alkalizing effects in the body. It involves three rounds of power breathing followed by a breath hold.\n\nIMPORTANT: Never practice while driving, near water, or standing up. Tingling and lightheadedness are normal. Passing out is not.`,
+    steps:[
+      {num:'1', text:'Sit or lie down comfortably. Take 30 full, deep breaths through the mouth. Each exhale is a passive release, not a forced exhale.'},
+      {num:'2', text:'After breath 30: exhale and hold empty. Hold as long as comfortable.'},
+      {num:'3', text:'When you feel the urge to breathe: take one deep inhale, hold for 15 seconds, then release.'},
+      {num:'4', text:'That is one round. Rest and observe. Do 3 rounds total.'},
+      {num:'5', text:'After completion: sit quietly for 5 minutes. Notice the energy in your body.'},
+    ]
+  },
+  {
+    emoji:'💚',
+    tag:'Coherence',
+    title:'Heart Coherence Breathing',
+    preview:'Sync your heart and brain. 5.5 seconds in, 5.5 seconds out.',
+    text:`Heart coherence is a physiological state where your heart rhythm becomes smooth and ordered, which synchronizes with your brain. Research from the HeartMath Institute shows this state reduces stress hormones, enhances cognitive function, and increases emotional resilience.\n\nThe key ratio is 5.5 seconds inhale, 5.5 seconds exhale. This creates approximately 5.5 breaths per minute, which is the resonance frequency of the cardiovascular system.`,
+    steps:[
+      {num:'1', text:'Place your hand on your heart. Close your eyes.'},
+      {num:'2', text:'Breathe in for 5.5 seconds. Imagine your breath flowing in through your heart center.'},
+      {num:'3', text:'Breathe out for 5.5 seconds. Imagine warmth radiating from your heart.'},
+      {num:'4', text:'As you breathe, recall a feeling of genuine appreciation or love. Hold it.'},
+      {num:'5', text:'Continue for 5 to 10 minutes. This is one of the most powerful shifts you can make in under 10 minutes.'},
+    ],
+    hasTimer: true,
+    timerPattern: [{phase:'Inhale', duration:5500}, {phase:'Exhale', duration:5500}]
+  },
+];
+
+// Demo community data
+const DEMO_CLASSES = [
+  {emoji:'🌅', name:'Morning Rise Collective', host:'Sarah M.', type:'mixed', desc:'A 20-minute morning practice combining breath, affirmations, and visualization. Show up as you are.', day:'Mon / Wed / Fri', time:'7:00 AM EST', members:34, joined:false},
+  {emoji:'🌙', name:'Night Wind-Down Circle', host:'James K.', type:'meditation', desc:'Guided sleep meditation and breathwork to release the day and prepare your mind for deep rest.', day:'Every Night', time:'9:30 PM EST', members:21, joined:false},
+  {emoji:'⚡', name:'Breathwork Warriors', host:'Priya T.', type:'breathwork', desc:'Wim Hof and advanced breathwork sessions. Not for the faint of heart. Come ready to go deep.', day:'Tue / Thu', time:'6:00 AM EST', members:18, joined:false},
+  {emoji:'✦', name:'Abundance Affirmation Circle', host:'Marcus D.', type:'affirmation', desc:'7-chakra affirmation sequence done together, out loud, in community. Something shifts when you are not alone.', day:'Saturday', time:'8:00 AM EST', members:47, joined:false},
+];
+
+const DEMO_POSTS = [
+  {emoji:'🌿', name:'Sarah M.', time:'2h ago', text:'Day 14 of my streak. Never thought I would say this but the morning ritual is the part of my day I protect most fiercely now. Something about starting with intention before the world gets loud.', likes:23, liked:false},
+  {emoji:'⚡', name:'Marcus D.', time:'5h ago', text:'Box breathing before my presentation today. Full room, high stakes. I was calm. That breath is not a small thing. It is a superpower.', likes:31, liked:false},
+  {emoji:'💫', name:'Jordan R.', time:'Yesterday', text:'Completed the Wim Hof breathwork for the first time. My hands went numb and then I felt completely alive. If you have been hesitating, just do it.', likes:18, liked:false},
+  {emoji:'🌙', name:'Priya T.', time:'2 days ago', text:'The 963 Hz frequency during the crown affirmation is doing something. I cannot explain it scientifically but my journaling after that frequency is always the most alive.', likes:27, liked:false},
+];
+
+// ===== STATE =====
+let currentScreen = 'home';
+let currentMode = null;
+let currentSteps = [];
+let completedSet = new Set();
+let openStepIdx = null;
+let streak = 0;
+let todayKey = '';
+let todayCompleted = {};
+let voices = [];
+let selVoice = -1;
+let spRate = 0.82;
+let audioCtx = null;
+let freqNodes = [];
+let activeFreqHz = null;
+let isSpeaking = false;
+let isPaused = false;
+let speechUtterance = null;
+let activeStepVoiceIdx = null;
+let jTabActive = 'today';
+let openPromptIdx = null;
+let openEntryKey = null;
+let openTeachIdx = null;
+let teachTabActive = 'meditation';
+let commTabActive = 'classes';
+let authMode = 'signin';
+let currentUser = null;
+let communityClasses = [...DEMO_CLASSES];
+let communityPosts = [...DEMO_POSTS];
+let breathTimerRunning = false;
+let breathTimerInterval = null;
+let breathPhaseIdx = 0;
+let breathCount = 0;
+let breathSecondsLeft = 0;
+let currentBreathPattern = null;
+
+// ===== AUTH =====
+function authTab(mode) {
+  authMode = mode;
+  document.getElementById('tab-signin').classList.toggle('active', mode==='signin');
+  document.getElementById('tab-signup').classList.toggle('active', mode==='signup');
+  document.getElementById('authName').style.display = mode==='signup'?'block':'none';
+  document.getElementById('authSubmit').textContent = mode==='signup'?'Create Account':'Sign In';
+  document.getElementById('authError').textContent = '';
+}
+
+function handleAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPass').value;
+  const name = document.getElementById('authName').value.trim();
+  document.getElementById('authError').textContent = '';
+
+  if(!email || !pass) { document.getElementById('authError').textContent = 'Please fill in all fields.'; return; }
+  if(authMode==='signup' && !name) { document.getElementById('authError').textContent = 'Please enter your name.'; return; }
+  if(pass.length < 6) { document.getElementById('authError').textContent = 'Password must be at least 6 characters.'; return; }
+
+  try {
+    const users = JSON.parse(localStorage.getItem('aligned_users')||'{}');
+    if(authMode==='signup') {
+      if(users[email]) { document.getElementById('authError').textContent = 'Account already exists. Sign in instead.'; return; }
+      users[email] = {name, email, pass, joined: new Date().toISOString()};
+      localStorage.setItem('aligned_users', JSON.stringify(users));
+      currentUser = {name, email};
+    } else {
+      const user = users[email];
+      if(!user || user.pass !== pass) { document.getElementById('authError').textContent = 'Invalid email or password.'; return; }
+      currentUser = {name:user.name, email};
+    }
+    localStorage.setItem('aligned_session', JSON.stringify(currentUser));
+    enterApp();
+  } catch(e) {
+    document.getElementById('authError').textContent = 'Something went wrong. Try again.';
+  }
+}
+
+function enterAsGuest() {
+  currentUser = {name:'Guest', email:'guest', isGuest:true};
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById('auth').classList.add('hidden');
+  setTimeout(()=>{ document.getElementById('auth').style.display='none'; }, 500);
+  document.getElementById('mainApp').style.display = 'block';
+  init();
+}
+
+function signOut() {
+  localStorage.removeItem('aligned_session');
+  currentUser = null;
+  document.getElementById('auth').style.display = 'flex';
+  document.getElementById('auth').classList.remove('hidden');
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('authEmail').value = '';
+  document.getElementById('authPass').value = '';
+  document.getElementById('authError').textContent = '';
+}
+
+function showProfileMenu() {
+  if(currentUser && !currentUser.isGuest) {
+    alert(`Signed in as: ${currentUser.name}\n${currentUser.email}\n\nStreak: ${streak} days`);
+  } else {
+    if(confirm('You are browsing as a guest. Sign in to save your progress?')) {
+      signOut();
+    }
+  }
+}
+
+function checkSession() {
+  try {
+    const session = JSON.parse(localStorage.getItem('aligned_session')||'null');
+    if(session) { currentUser = session; enterApp(); return; }
+  } catch(e){}
+  // Show auth screen
+  document.getElementById('auth').style.display = 'flex';
+}
+
+// ===== INIT =====
+function init() {
+  const now = new Date();
+  document.getElementById('homeDate').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  if(currentUser) {
+    const nameDisplay = currentUser.isGuest ? 'Guest' : currentUser.name;
+    document.getElementById('homeUsername').textContent = nameDisplay ? 'Welcome back, '+nameDisplay : '';
+  }
+  todayKey = now.toISOString().split('T')[0];
+  loadState();
+  renderChakraDots();
+  updateStreak();
+  renderTrackerStrip();
+  buildFreqGrid();
+  renderTeachings();
+  renderCommunity();
+  if(window.speechSynthesis) {
+    speechSynthesis.onvoiceschanged = () => { voices = speechSynthesis.getVoices(); buildSettings(); };
+    voices = speechSynthesis.getVoices();
+    buildSettings();
+  }
+}
+
+// ===== STATE PERSISTENCE =====
+function getStorageKey() {
+  return 'aligned_v4_' + (currentUser && !currentUser.isGuest ? currentUser.email : 'guest');
+}
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(getStorageKey())||'{}');
+    if(s.todayKey===todayKey) todayCompleted=s.todayCompleted||{};
+    streak = s.streak||0;
+    selVoice = s.selVoice!==undefined ? s.selVoice : -1;
+    spRate = s.spRate||0.82;
+    const yd = new Date(); yd.setDate(yd.getDate()-1);
+    const yk = yd.toISOString().split('T')[0];
+    if(s.lastDone!==todayKey && s.lastDone!==yk) streak=0;
+  } catch(e){}
+}
+
+function saveState() {
+  try {
+    const cur = JSON.parse(localStorage.getItem(getStorageKey())||'{}');
+    localStorage.setItem(getStorageKey(), JSON.stringify({...cur, todayKey, todayCompleted, streak, selVoice, spRate, lastDone:todayKey}));
+  } catch(e){}
+}
+
+function updateStreak() {
+  document.getElementById('streakNum').textContent = streak;
+  document.getElementById('streakDisplay').textContent = streak + (streak===1?' Day':' Days');
+  const arc = document.getElementById('streakArc');
+  const circ = 301;
+  arc.style.strokeDashoffset = circ - circ*Math.min(streak/30,1);
+}
+
+function renderTrackerStrip() {
+  const wrap = document.getElementById('trackerDays');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const days = ['S','M','T','W','T','F','S'];
+  const now = new Date();
+  const today = now.getDay();
+  for(let i=0; i<7; i++) {
+    const offset = i - today;
+    const d = new Date(now); d.setDate(now.getDate()+offset);
+    const key = d.toISOString().split('T')[0];
+    const isToday = offset===0;
+    const isPast = offset<0;
+    let cls = '';
+    try {
+      const s = JSON.parse(localStorage.getItem(getStorageKey())||'{}');
+      if(s.completedDays && s.completedDays[key]) cls = 'done';
+      else if(isToday && (todayCompleted.morning||todayCompleted.night)) cls = 'partial';
+    } catch(e){}
+    if(isToday && !cls) cls = 'today';
+    const div = document.createElement('div');
+    div.className = 'tracker-day';
+    div.innerHTML = `<div class="tracker-day-label">${days[i]}</div><div class="tracker-day-circle ${cls}">${cls==='done'?'✓':d.getDate()}</div>`;
+    wrap.appendChild(div);
+  }
+}
+
+function renderChakraDots() {
+  const wrap = document.getElementById('chakraDots');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  const done = todayCompleted.chakras||[];
+  CHAKRAS.forEach((ch,i)=>{
+    const d=document.createElement('div');
+    d.className='ch-dot'+(done.includes(i)?' lit':'');
+    d.style.color=ch.color; d.style.borderColor=ch.color;
+    wrap.appendChild(d);
+  });
+}
+
+// ===== NAVIGATION =====
+function navTo(id) {
+  document.querySelectorAll('#mainApp .screen').forEach(s=>s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if(target) target.classList.add('active');
+  currentScreen=id;
+  if(id==='journal') { renderJournal(); }
+  if(id==='teachings') renderTeachings();
+  if(id==='community') renderCommunity();
+  if(id==='home') { renderChakraDots(); updateStreak(); renderTrackerStrip(); }
+}
+
+function goHome() { stopAll(); navTo('home'); }
+
+// ===== RITUAL =====
+function startRitual(mode) {
+  currentMode=mode;
+  completedSet=new Set();
+  openStepIdx=null;
+  if(mode==='morning') { currentSteps=MORNING_STEPS; document.getElementById('ritualLabel').textContent='Morning Ritual'; document.getElementById('ritualTitle').textContent='Begin Your Practice'; }
+  else if(mode==='night') { currentSteps=NIGHT_STEPS; document.getElementById('ritualLabel').textContent='Night Ritual'; document.getElementById('ritualTitle').textContent='Close Your Day'; }
+  else { currentSteps=AFFIRM_ONLY; document.getElementById('ritualLabel').textContent='Affirmations'; document.getElementById('ritualTitle').textContent='All Seven Chakras'; }
+  renderSteps();
+  updateProgress();
+  navTo('ritual');
+}
+
+function renderSteps() {
+  const list = document.getElementById('stepsList');
+  list.innerHTML='';
+  currentSteps.forEach((step,i)=>{
+    const ch = step.chakraIdx!==null ? CHAKRAS[step.chakraIdx] : null;
+    const color = ch ? ch.color : '#4ecdc4';
+    const aff = step.chakraIdx!==null ? AFFIRMATIONS[step.chakraIdx] : null;
+    const freqInfo = FREQS.find(f=>f.hz===step.freqHz)||FREQS[0];
+    const hzLabel = step.freqHz===40?'40 Hz Gamma':step.freqHz===2?'2 Hz Delta':step.freqHz+' Hz';
+    const el=document.createElement('div');
+    el.className='step-item'; el.id=`si-${i}`;
+    el.innerHTML=`
+      <div class="step-head" onclick="toggleStep(${i})">
+        <div class="step-dot" style="color:${color};border-color:${color}" id="sdot-${i}"></div>
+        <div class="step-meta">
+          <div class="step-num">${step.num}</div>
+          <div class="step-name">${step.name}</div>
+          ${ch?`<div class="step-sub">${ch.label} · ${ch.sub}</div>`:''}
+        </div>
+        <div class="step-check-circle" id="chk-${i}" onclick="event.stopPropagation();markDone(${i})">✓</div>
+      </div>
+      <div class="step-body" id="sb-${i}">
+        <div class="step-inner">
+          <div class="freq-pill">♪ ${hzLabel} · ${freqInfo.label}</div>
+          ${aff ? `
+            <div class="affirmation-opener" style="color:${color}">${aff.opener.toUpperCase()}</div>
+            <div class="affirmation-body">${aff.body}</div>
+          ` : `<div class="step-detail">${step.detail}</div>`}
+          <div class="audio-controls">
+            <button class="audio-btn" id="vbtn-${i}" onclick="handleVoice(${i})">
+              <span class="btn-icon">🔊</span> Read To Me
+            </button>
+            <button class="audio-btn" id="fbtn-${i}" onclick="handleFreq(${i})">
+              <span class="btn-icon">♪</span> Frequency
+            </button>
+          </div>
+          <button class="mark-done-btn" id="dbtn-${i}" onclick="markDone(${i})">Mark Complete</button>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+function toggleStep(i) {
+  if(openStepIdx===i){ closeStep(i); openStepIdx=null; return; }
+  if(openStepIdx!==null) closeStep(openStepIdx);
+  openStepIdx=i;
+  document.getElementById(`sb-${i}`).classList.add('open');
+  document.getElementById(`si-${i}`).classList.add('is-open');
+  startFreqForStep(i);
+}
+
+function closeStep(i) {
+  document.getElementById(`sb-${i}`)?.classList.remove('open');
+  document.getElementById(`si-${i}`)?.classList.remove('is-open');
+}
+
+function handleVoice(i) {
+  if(isSpeaking && activeStepVoiceIdx===i) { togglePause(); return; }
+  speakStep(i);
+}
+
+function handleFreq(i) {
+  const btn=document.getElementById(`fbtn-${i}`);
+  if(btn.classList.contains('active')){ stopFreq(); return; }
+  startFreqForStep(i);
+}
+
+function startFreqForStep(i) {
+  const step=currentSteps[i];
+  startFreq(step.freqHz, i);
+}
+
+function speakStep(i) {
+  if(!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const step=currentSteps[i];
+  const u=new SpeechSynthesisUtterance(step.voice);
+  u.rate=spRate; u.pitch=0.9; u.volume=1;
+  if(selVoice>=0 && selVoice<voices.length) u.voice=voices[selVoice];
+  speechUtterance=u;
+  isSpeaking=true; isPaused=false; activeStepVoiceIdx=i;
+  const vbtn=document.getElementById(`vbtn-${i}`);
+  if(vbtn){ vbtn.classList.add('active'); vbtn.innerHTML='<span class="btn-icon">⏸</span> Pause'; }
+  showAudioBar(step.name, step.chakraIdx!==null ? CHAKRAS[step.chakraIdx].label+' Chakra' : 'Speaking');
+  document.getElementById('abPause').textContent='⏸';
+  u.onend=u.onerror=()=>{
+    isSpeaking=false; isPaused=false; activeStepVoiceIdx=null;
+    if(vbtn){ vbtn.classList.remove('active'); vbtn.innerHTML='<span class="btn-icon">🔊</span> Read To Me'; }
+    if(!activeFreqHz) hideAudioBar();
+  };
+  speechSynthesis.speak(u);
+}
+
+function togglePause() {
+  if(!window.speechSynthesis) return;
+  if(isPaused) {
+    speechSynthesis.resume(); isPaused=false;
+    document.getElementById('abPause').textContent='⏸';
+    if(activeStepVoiceIdx!==null){
+      const vbtn=document.getElementById(`vbtn-${activeStepVoiceIdx}`);
+      if(vbtn) vbtn.innerHTML='<span class="btn-icon">⏸</span> Pause';
+    }
+  } else {
+    speechSynthesis.pause(); isPaused=true;
+    document.getElementById('abPause').textContent='▶';
+    if(activeStepVoiceIdx!==null){
+      const vbtn=document.getElementById(`vbtn-${activeStepVoiceIdx}`);
+      if(vbtn) vbtn.innerHTML='<span class="btn-icon">▶</span> Resume';
+    }
+  }
+}
+
+function markDone(i) {
+  const step=currentSteps[i];
+  const chk=document.getElementById(`chk-${i}`);
+  const card=document.getElementById(`si-${i}`);
+  const dot=document.getElementById(`sdot-${i}`);
+  const dbtn=document.getElementById(`dbtn-${i}`);
+  if(completedSet.has(i)){
+    completedSet.delete(i);
+    chk.classList.remove('checked'); card.classList.remove('is-done');
+    dot.classList.remove('filled'); dbtn.textContent='Mark Complete'; dbtn.classList.remove('undone');
+  } else {
+    completedSet.add(i);
+    chk.classList.add('checked'); card.classList.add('is-done');
+    dot.classList.add('filled'); dbtn.textContent='Completed ✓'; dbtn.classList.add('undone');
+    if(step.chakraIdx!==null){
+      const done=todayCompleted.chakras||[];
+      if(!done.includes(step.chakraIdx)){ done.push(step.chakraIdx); todayCompleted.chakras=done; saveState(); }
+    }
+    const next=currentSteps.findIndex((_,j)=>j>i && !completedSet.has(j));
+    if(next!==-1) setTimeout(()=>{ closeStep(i); toggleStep(next); document.getElementById(`si-${next}`)?.scrollIntoView({behavior:'smooth',block:'center'}); },700);
+  }
+  updateProgress();
+  if(completedSet.size===currentSteps.length) setTimeout(showCompletion,800);
+}
+
+function updateProgress() {
+  const pct=currentSteps.length?(completedSet.size/currentSteps.length)*100:0;
+  document.getElementById('progFill').style.width=pct+'%';
+}
+
+function showCompletion() {
+  stopAll();
+  todayCompleted[currentMode]=true;
+  if(todayCompleted.morning || todayCompleted.night) {
+    streak++;
+    // Mark today as complete in tracker
+    try {
+      const s = JSON.parse(localStorage.getItem(getStorageKey())||'{}');
+      if(!s.completedDays) s.completedDays = {};
+      s.completedDays[todayKey] = true;
+      localStorage.setItem(getStorageKey(), JSON.stringify(s));
+    } catch(e){}
+  }
+  saveState();
+  const msgs={
+    morning:'You have declared your truth. Your highest self heard every word. Now go live it.',
+    night:'You sealed your day with intention. Let your subconscious carry it. Sleep as someone who knows they are on the right path.',
+    affirm:'All seven chakras aligned. Rooted, open, powerful, loving, truthful, visionary, connected. Go be that person.'
+  };
+  document.getElementById('completionMsg').textContent=msgs[currentMode]||msgs.morning;
+  document.getElementById('completion').classList.add('show');
+  setTimeout(()=>{
+    if(window.speechSynthesis){
+      const u=new SpeechSynthesisUtterance(msgs[currentMode]);
+      u.rate=spRate; u.pitch=0.9;
+      if(selVoice>=0 && selVoice<voices.length) u.voice=voices[selVoice];
+      speechSynthesis.speak(u);
+    }
+  },600);
+}
+
+function closeCompletion() {
+  document.getElementById('completion').classList.remove('show');
+  goHome();
+}
+
+// ===== AUDIO =====
+function getCtx() {
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function startFreq(hz, stepIdx) {
+  stopFreq();
+  activeFreqHz=hz;
+  const info=FREQS.find(f=>f.hz===hz)||FREQS[0];
+  try {
+    const ctx=getCtx();
+    const gain=ctx.createGain();
+    gain.gain.setValueAtTime(0.07, ctx.currentTime);
+    gain.connect(ctx.destination);
+    if(info.type==='binaural'){
+      const splitter=ctx.createChannelSplitter(2);
+      const merger=ctx.createChannelMerger(2);
+      merger.connect(gain);
+      const oL=ctx.createOscillator(); oL.frequency.value=info.carrier; oL.type='sine';
+      const gL=ctx.createGain(); gL.gain.value=1; oL.connect(gL); gL.connect(merger,0,0);
+      oL.start(); freqNodes.push(oL);
+      const oR=ctx.createOscillator(); oR.frequency.value=info.carrier+info.beat; oR.type='sine';
+      const gR=ctx.createGain(); gR.gain.value=1; oR.connect(gR); gR.connect(merger,0,1);
+      oR.start(); freqNodes.push(oR);
+    } else {
+      const o=ctx.createOscillator(); o.frequency.value=hz; o.type='sine'; o.connect(gain); o.start(); freqNodes.push(o);
+    }
+  } catch(e){}
+  const hzLabel=hz===40?'40 Hz':hz===2?'2 Hz':hz+' Hz';
+  showAudioBar(hzLabel+' · '+info.label, info.use);
+  if(stepIdx!==undefined){
+    document.querySelectorAll('[id^="fbtn-"]').forEach(b=>{ b.classList.remove('active'); b.innerHTML='<span class="btn-icon">♪</span> Frequency'; });
+    const fb=document.getElementById(`fbtn-${stepIdx}`);
+    if(fb){ fb.classList.add('active'); fb.innerHTML='<span class="btn-icon">♪</span> Playing'; }
+  }
+  document.querySelectorAll('.freq-toggle').forEach(b=>b.classList.remove('on'));
+  const fi=FREQS.findIndex(f=>f.hz===hz);
+  const ft=document.getElementById(`ft-${fi}`);
+  if(ft) ft.classList.add('on');
+}
+
+function stopFreq() {
+  freqNodes.forEach(n=>{ try{n.stop();}catch(e){} });
+  freqNodes=[]; activeFreqHz=null;
+  document.querySelectorAll('[id^="fbtn-"]').forEach(b=>{ b.classList.remove('active'); b.innerHTML='<span class="btn-icon">♪</span> Frequency'; });
+  document.querySelectorAll('.freq-toggle').forEach(b=>{ b.classList.remove('on'); b.textContent='▶'; });
+  if(!isSpeaking) hideAudioBar();
+}
+
+function stopAll() {
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  stopFreq(); stopBreathTimer();
+  isSpeaking=false; isPaused=false; activeStepVoiceIdx=null;
+  hideAudioBar();
+}
+
+function showAudioBar(title, sub) {
+  document.getElementById('abTitle').textContent=title;
+  document.getElementById('abSub').textContent=sub||'';
+  document.getElementById('audioBar').classList.add('visible');
+}
+function hideAudioBar() { document.getElementById('audioBar').classList.remove('visible'); }
+
+// ===== FREQ GRID =====
+function buildFreqGrid() {
+  const grid=document.getElementById('freqGrid');
+  if(!grid) return;
+  grid.innerHTML='';
+  FREQS.forEach((f,i)=>{
+    const hzLabel=f.hz===40?'40 Hz':f.hz===2?'2 Hz':f.hz===10?'10 Hz':f.hz===6?'6 Hz':f.hz+' Hz';
+    const el=document.createElement('div'); el.className='freq-item';
+    el.innerHTML=`
+      <div class="freq-hz">${hzLabel}</div>
+      <div class="freq-info">
+        <div class="freq-name">${f.label}</div>
+        <div class="freq-desc">${f.desc}</div>
+        <div class="freq-use">${f.use}</div>
+      </div>
+      <button class="freq-toggle" id="ft-${i}" onclick="toggleFreqLib(${i})">▶</button>`;
+    grid.appendChild(el);
+  });
+}
+
+function toggleFreqLib(i) {
+  const btn=document.getElementById(`ft-${i}`);
+  if(btn.classList.contains('on')){ stopFreq(); return; }
+  startFreq(FREQS[i].hz);
+  document.querySelectorAll('.freq-toggle').forEach((b,j)=>{ b.classList.toggle('on',j===i); b.textContent=j===i?'■':'▶'; });
+}
+
+// ===== JOURNAL =====
+function jTab(t) {
+  jTabActive=t;
+  document.getElementById('jtab-today').classList.toggle('active',t==='today');
+  document.getElementById('jtab-past').classList.toggle('active',t==='past');
+  renderJournal();
+}
+
+function renderJournal() {
+  const body=document.getElementById('journalContent');
+  if(!body) return;
+  body.innerHTML='';
+  jTabActive==='today' ? renderTodayJournal(body) : renderPastJournal(body);
+}
+
+function renderTodayJournal(body) {
+  const now=new Date();
+  const saved=getEntry(todayKey)||{};
+  let h=`<div class="j-date-line">${now.toLocaleDateString('en-US',{weekday:'long'})}</div>`;
+  h+=`<div class="j-date-sub">${now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>`;
+  JOURNAL_PROMPTS.forEach((p,i)=>{
+    const val=saved[i]||'';
+    const isOpen=openPromptIdx===i;
+    h+=`
+      <div class="j-prompt${val?' has-content':''}" id="jp-${i}">
+        <div class="j-prompt-head" onclick="togglePrompt(${i})">
+          <div class="j-prompt-cat ${p.cls}">${p.cat}</div>
+          <div class="j-prompt-text">${p.q}</div>
+          <div class="j-chevron${isOpen?' open':''}" id="jchev-${i}">›</div>
+        </div>
+        <div class="j-prompt-body${isOpen?' open':''}" id="jpb-${i}">
+          <div class="j-prompt-inner">
+            <textarea class="j-textarea" id="jta-${i}" placeholder="Write freely. This is only for you.">${val}</textarea>
+            <button class="j-save-btn${val?' saved':''}" id="jsb-${i}" onclick="savePrompt(${i})">
+              ${val?'Saved ✓':'Save'}
+            </button>
+          </div>
+        </div>
+      </div>`;
+  });
+  body.innerHTML=h;
+}
+
+function togglePrompt(i) {
+  const was=openPromptIdx===i;
+  if(openPromptIdx!==null){
+    document.getElementById(`jpb-${openPromptIdx}`)?.classList.remove('open');
+    document.getElementById(`jchev-${openPromptIdx}`)?.classList.remove('open');
+  }
+  if(was){ openPromptIdx=null; return; }
+  openPromptIdx=i;
+  document.getElementById(`jpb-${i}`).classList.add('open');
+  document.getElementById(`jchev-${i}`).classList.add('open');
+  setTimeout(()=>document.getElementById(`jp-${i}`)?.scrollIntoView({behavior:'smooth',block:'center'}),200);
+}
+
+function savePrompt(i) {
+  const val=document.getElementById(`jta-${i}`).value.trim();
+  const entry=getEntry(todayKey)||{};
+  if(val) entry[i]=val; else delete entry[i];
+  setEntry(todayKey,entry);
+  const btn=document.getElementById(`jsb-${i}`);
+  btn.textContent='Saved ✓'; btn.classList.add('saved');
+  document.getElementById(`jp-${i}`)?.classList.toggle('has-content',!!val);
+  setTimeout(()=>{ btn.textContent='Save'; btn.classList.remove('saved'); },2200);
+}
+
+function renderPastJournal(body) {
+  const all=getAllEntries();
+  const keys=Object.keys(all).filter(k=>Object.keys(all[k]).length>0).sort((a,b)=>b.localeCompare(a));
+  if(!keys.length){ body.innerHTML=`<div class="empty-state"><div class="empty-icon">✍</div><div class="empty-text">No entries yet.<br>Start writing today.</div></div>`; return; }
+  let h='';
+  keys.forEach((key,ei)=>{
+    const entry=all[key];
+    const date=new Date(key+'T12:00:00');
+    const dl=date.toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric'});
+    const fi=Object.keys(entry)[0];
+    const preview=fi!==undefined?(entry[fi]||'').substring(0,55)+'…':'';
+    const isOpen=openEntryKey===key;
+    h+=`
+      <div class="entry-item" id="ei-${ei}">
+        <div class="entry-head" onclick="toggleEntry('${key}',${ei})">
+          <div style="flex:1">
+            <div class="entry-date-label">${dl}</div>
+            <div class="entry-preview">${preview}</div>
+          </div>
+          <div class="entry-chevron${isOpen?' open':''}" id="ech-${ei}">›</div>
+        </div>
+        <div class="entry-body${isOpen?' open':''}" id="eb-${ei}">
+          <div class="entry-body-inner">
+            ${Object.keys(entry).map(pi=>`
+              <div class="entry-resp">
+                <div class="entry-cat">${JOURNAL_PROMPTS[pi]?.cat||''}</div>
+                <div class="entry-q">${JOURNAL_PROMPTS[pi]?.q||''}</div>
+                <div class="entry-a">${(entry[pi]||'').replace(/</g,'&lt;')}</div>
+              </div>`).join('')}
+            <button class="del-btn" onclick="delEntry('${key}')">Delete Entry</button>
+          </div>
+        </div>
+      </div>`;
+  });
+  body.innerHTML=h;
+}
+
+function toggleEntry(key,ei) {
+  const was=openEntryKey===key;
+  document.querySelectorAll('.entry-body').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.entry-chevron').forEach(c=>c.classList.remove('open'));
+  if(was){ openEntryKey=null; return; }
+  openEntryKey=key;
+  document.getElementById(`eb-${ei}`).classList.add('open');
+  document.getElementById(`ech-${ei}`).classList.add('open');
+}
+
+function delEntry(key) {
+  if(!confirm('Delete this entry?')) return;
+  const all=getAllEntries(); delete all[key];
+  localStorage.setItem(getStorageKey()+'_journal', JSON.stringify(all));
+  openEntryKey=null; renderJournal();
+}
+
+function getEntry(key){ try{ return JSON.parse(localStorage.getItem(getStorageKey()+'_journal')||'{}')[key]; }catch(e){ return null; } }
+function setEntry(key,data){ try{ const a=JSON.parse(localStorage.getItem(getStorageKey()+'_journal')||'{}'); a[key]=data; localStorage.setItem(getStorageKey()+'_journal', JSON.stringify(a)); }catch(e){} }
+function getAllEntries(){ try{ return JSON.parse(localStorage.getItem(getStorageKey()+'_journal')||'{}'); }catch(e){ return {}; } }
+
+// ===== TEACHINGS =====
+function teachTab(t) {
+  teachTabActive=t;
+  document.getElementById('ttab-meditation').classList.toggle('active',t==='meditation');
+  document.getElementById('ttab-breathwork').classList.toggle('active',t==='breathwork');
+  openTeachIdx=null;
+  stopBreathTimer();
+  renderTeachings();
+}
+
+function renderTeachings() {
+  const body=document.getElementById('teachingsContent');
+  if(!body) return;
+  const list = teachTabActive==='meditation' ? MEDITATION_TEACHINGS : BREATHWORK_TEACHINGS;
+  let h = '';
+  list.forEach((t,i)=>{
+    const isOpen = openTeachIdx===i;
+    const stepsHtml = t.steps.map(s=>`<div class="teaching-step"><div class="teaching-step-num">${s.num}</div><div class="teaching-step-text">${s.text}</div></div>`).join('');
+    const timerHtml = t.hasTimer ? `
+      <div class="breath-timer" id="btimer-${i}">
+        <div class="breath-circle" id="bcircle-${i}">Ready</div>
+        <div class="breath-phase-label" id="bphase-${i}"></div>
+        <div class="breath-counter" id="bcounter-${i}"></div>
+        <button class="breath-start-btn" id="bstart-${i}" onclick="startBreathTimer(${i})">Start Timer</button>
+      </div>` : '';
+    h+=`
+      <div class="teaching-card" id="tc-${i}">
+        <div class="teaching-head" onclick="toggleTeaching(${i})">
+          <div class="teaching-emoji">${t.emoji}</div>
+          <div class="teaching-meta">
+            <div class="teaching-tag">${t.tag}</div>
+            <div class="teaching-title">${t.title}</div>
+            <div class="teaching-preview">${t.preview}</div>
+          </div>
+          <div class="teaching-chevron${isOpen?' open':''}" id="tchev-${i}">›</div>
+        </div>
+        <div class="teaching-body${isOpen?' open':''}" id="tb-${i}">
+          <div class="teaching-inner">
+            <div class="teaching-text">${t.text.replace(/\n/g,'<br><br>')}</div>
+            <div class="teaching-steps">${stepsHtml}</div>
+            ${timerHtml}
+          </div>
+        </div>
+      </div>`;
+  });
+  body.innerHTML=h;
+}
+
+function toggleTeaching(i) {
+  const was = openTeachIdx===i;
+  if(openTeachIdx!==null){
+    document.getElementById(`tb-${openTeachIdx}`)?.classList.remove('open');
+    document.getElementById(`tchev-${openTeachIdx}`)?.classList.remove('open');
+  }
+  stopBreathTimer();
+  if(was){ openTeachIdx=null; return; }
+  openTeachIdx=i;
+  document.getElementById(`tb-${i}`).classList.add('open');
+  document.getElementById(`tchev-${i}`).classList.add('open');
+  setTimeout(()=>document.getElementById(`tc-${i}`)?.scrollIntoView({behavior:'smooth',block:'start'}),200);
+}
+
+// ===== BREATH TIMER =====
+function startBreathTimer(teachingIdx) {
+  stopBreathTimer();
+  const list = teachTabActive==='meditation' ? MEDITATION_TEACHINGS : BREATHWORK_TEACHINGS;
+  const teaching = list[teachingIdx];
+  if(!teaching.hasTimer) return;
+  currentBreathPattern = teaching.timerPattern;
+  breathPhaseIdx = 0;
+  breathCount = 0;
+  const btn = document.getElementById(`bstart-${teachingIdx}`);
+  if(btn) btn.textContent = 'Stop Timer';
+  if(btn) btn.onclick = ()=>{ stopBreathTimer(); if(btn){ btn.textContent='Start Timer'; btn.onclick=()=>startBreathTimer(teachingIdx); } };
+  runBreathPhase(teachingIdx);
+}
+
+function runBreathPhase(teachingIdx) {
+  if(!currentBreathPattern) return;
+  const phase = currentBreathPattern[breathPhaseIdx];
+  const circle = document.getElementById(`bcircle-${teachingIdx}`);
+  const phaseEl = document.getElementById(`bphase-${teachingIdx}`);
+  const counterEl = document.getElementById(`bcounter-${teachingIdx}`);
+  if(!circle) return;
+
+  if(phaseEl) phaseEl.textContent = phase.phase.toUpperCase();
+  circle.className = 'breath-circle';
+  if(phase.phase==='Inhale') circle.classList.add('expand');
+  else if(phase.phase==='Hold') circle.classList.add('hold');
+  else circle.classList.add('exhale');
+  circle.textContent = phase.phase;
+
+  let timeLeft = phase.duration/1000;
+  if(counterEl) counterEl.textContent = Math.ceil(timeLeft)+'s';
+
+  clearInterval(breathTimerInterval);
+  breathTimerRunning = true;
+  breathTimerInterval = setInterval(()=>{
+    timeLeft -= 0.1;
+    if(counterEl) counterEl.textContent = Math.max(0,Math.ceil(timeLeft))+'s';
+    if(timeLeft<=0) {
+      clearInterval(breathTimerInterval);
+      breathPhaseIdx = (breathPhaseIdx+1) % currentBreathPattern.length;
+      if(breathPhaseIdx===0) breathCount++;
+      if(breathCount<6) runBreathPhase(teachingIdx);
+      else {
+        if(circle) { circle.className='breath-circle'; circle.textContent='Done ✓'; }
+        if(phaseEl) phaseEl.textContent='Session complete';
+        if(counterEl) counterEl.textContent='';
+        breathTimerRunning=false;
+      }
+    }
+  },100);
+}
+
+function stopBreathTimer() {
+  clearInterval(breathTimerInterval);
+  breathTimerRunning=false;
+  currentBreathPattern=null;
+  breathPhaseIdx=0; breathCount=0;
+}
+
+// ===== COMMUNITY =====
+function commTab(t) {
+  commTabActive=t;
+  document.getElementById('ctab-classes').classList.toggle('active',t==='classes');
+  document.getElementById('ctab-feed').classList.toggle('active',t==='feed');
+  renderCommunity();
+}
+
+function renderCommunity() {
+  const body=document.getElementById('communityContent');
+  if(!body) return;
+  if(commTabActive==='classes') renderClasses(body);
+  else renderFeed(body);
+}
+
+function renderClasses(body) {
+  let h = `
+    <div class="community-header">
+      <div class="community-heading">Live Classes</div>
+      <div class="community-subheading">Join a practice led by a real person. Show up, breathe together, grow together.</div>
+    </div>
+    <button class="create-class-btn" onclick="openClassModal()">＋ &nbsp; Start Your Own Class</button>`;
+  communityClasses.forEach((cls,i)=>{
+    h+=`
+      <div class="class-card">
+        <div class="class-card-top">
+          <div class="class-avatar">${cls.emoji}</div>
+          <div class="class-info">
+            <div class="class-name">${cls.name}</div>
+            <div class="class-host">Hosted by <span>${cls.host}</span></div>
+          </div>
+        </div>
+        <div class="class-tags">
+          <div class="class-tag ${cls.type}">${cls.type.charAt(0).toUpperCase()+cls.type.slice(1)}</div>
+        </div>
+        <div class="class-desc">${cls.desc}</div>
+        <div class="class-meta">
+          <div class="class-meta-item">🗓 <span>${cls.day}</span></div>
+          <div class="class-meta-item">🕐 <span>${cls.time}</span></div>
+          <div class="class-meta-item">👥 <span>${cls.members}</span></div>
+          <button class="class-join-btn ${cls.joined?'joined':''}" onclick="toggleJoin(${i})">${cls.joined?'Joined ✓':'Join'}</button>
+        </div>
+      </div>`;
+  });
+  body.innerHTML=h;
+}
+
+function renderFeed(body) {
+  let h = `
+    <div class="community-header">
+      <div class="community-heading">Community Feed</div>
+      <div class="community-subheading">What your people are doing, feeling, and building.</div>
+    </div>`;
+  communityPosts.forEach((p,i)=>{
+    h+=`
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar">${p.emoji}</div>
+          <div>
+            <div class="post-author">${p.name}</div>
+            <div class="post-time">${p.time}</div>
+          </div>
+        </div>
+        <div class="post-text">${p.text}</div>
+        <div class="post-actions">
+          <button class="post-action ${p.liked?'liked':''}" onclick="toggleLike(${i})">
+            ${p.liked?'♥':'♡'} ${p.likes}
+          </button>
+          <button class="post-action">💬 Reply</button>
+          <button class="post-action">↗ Share</button>
+        </div>
+      </div>`;
+  });
+  body.innerHTML=h;
+}
+
+function toggleJoin(i) {
+  communityClasses[i].joined = !communityClasses[i].joined;
+  if(communityClasses[i].joined) communityClasses[i].members++;
+  else communityClasses[i].members--;
+  renderCommunity();
+}
+
+function toggleLike(i) {
+  communityPosts[i].liked = !communityPosts[i].liked;
+  if(communityPosts[i].liked) communityPosts[i].likes++;
+  else communityPosts[i].likes--;
+  renderCommunity();
+}
+
+function openClassModal() {
+  document.getElementById('createClassModal').classList.add('show');
+}
+function closeClassModal() {
+  document.getElementById('createClassModal').classList.remove('show');
+}
+
+function submitClass() {
+  const name = document.getElementById('className').value.trim();
+  const desc = document.getElementById('classDesc').value.trim();
+  const type = document.getElementById('classType').value;
+  const day = document.getElementById('classDay').value.trim();
+  const time = document.getElementById('classTime').value.trim();
+  if(!name || !desc) { alert('Please fill in the class name and description.'); return; }
+  const emojis = {meditation:'🧘', breathwork:'🌬️', affirmation:'✦', mixed:'🌀'};
+  communityClasses.unshift({
+    emoji: emojis[type]||'✦',
+    name, host: currentUser?.name||'You',
+    type, desc,
+    day: day||'TBD', time: time||'TBD',
+    members: 1, joined: true
+  });
+  closeClassModal();
+  document.getElementById('className').value='';
+  document.getElementById('classDesc').value='';
+  document.getElementById('classDay').value='';
+  document.getElementById('classTime').value='';
+  renderCommunity();
+}
+
+// ===== SETTINGS =====
+function buildSettings() {
+  const body=document.getElementById('settingsContent');
+  if(!body) return;
+  const cats={calm:[],female:[],male:[]};
+  voices.forEach((v,i)=>{
+    const n=v.name.toLowerCase();
+    const calm=n.includes('samantha')||n.includes('karen')||n.includes('moira')||n.includes('serena')||n.includes('allison')||n.includes('ava')||n.includes('tessa')||n.includes('zoe')||n.includes('kate');
+    const female=calm||n.includes('female')||n.includes('victoria')||n.includes('susan')||n.includes('woman')||n.includes('aria')||n.includes('jenny')||n.includes('sonia');
+    if(calm) cats.calm.push({v,i});
+    else if(female) cats.female.push({v,i});
+    else cats.male.push({v,i});
+  });
+  const groups=[
+    {label:'Calm Voices (Recommended)', list:cats.calm},
+    {label:'Female Voices', list:cats.female.slice(0,8)},
+    {label:'Male Voices', list:cats.male.slice(0,8)},
+  ].filter(g=>g.list.length>0);
+
+  let h=`<div class="settings-section"><div class="settings-label">Voice</div>`;
+  h+=`<p class="settings-note" style="margin-bottom:14px">Best results on iPhone in Safari. Look for Samantha, Karen, or Ava under Calm Voices. 0.82x speed hits a meditative tone.</p>`;
+  if(!voices.length) {
+    h+=`<p class="settings-note">No voices loaded yet. Tap Read To Me in any ritual to trigger loading, then return here.</p>`;
+  } else if(!groups.length) {
+    h+=renderVoiceGroup('All Voices', voices.slice(0,14).map((v,i)=>({v,i})));
+  } else {
+    groups.forEach(g=>{ h+=renderVoiceGroup(g.label, g.list); });
+  }
+  h+=`</div>
+  <div class="settings-section">
+    <div class="settings-label">Speaking Speed</div>
+    <div class="speed-row">
+      <div class="speed-label">Slower</div>
+      <input type="range" min="0.6" max="1.1" step="0.05" value="${spRate}" oninput="updateSpeed(this.value)" id="spSlider">
+      <div class="speed-val" id="spVal">${spRate.toFixed(2)}x</div>
+    </div>
+    <p class="settings-note">0.80 to 0.85 hits that slow, meditative feel.</p>
+  </div>
+  <div class="settings-section">
+    <div class="settings-label">Preview</div>
+    <button class="test-btn" onclick="testVoice()">▶ Preview Selected Voice</button>
+  </div>`;
+  body.innerHTML=h;
+}
+
+function renderVoiceGroup(label, list) {
+  let h=`<div style="margin-bottom:16px"><div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--teal-dim);margin-bottom:8px">${label}</div><div class="voice-list">`;
+  list.forEach(({v,i})=>{
+    const sel=i===selVoice;
+    h+=`<button class="voice-row${sel?' selected':''}" onclick="pickVoice(${i})">
+      <span class="vr-dot">${sel?'●':'○'}</span>
+      <span class="vr-name">${v.name}</span>
+      <span class="vr-lang">${v.lang}</span>
+    </button>`;
+  });
+  return h+'</div></div>';
+}
+
+function pickVoice(i) { selVoice=i; saveState(); buildSettings(); }
+function updateSpeed(v) { spRate=parseFloat(v); document.getElementById('spVal').textContent=spRate.toFixed(2)+'x'; saveState(); }
+function testVoice() {
+  if(!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance('I am aligned. I am becoming who I was always meant to be. Every breath is a declaration. Every day is a gift.');
+  u.rate=spRate; u.pitch=0.9; u.volume=1;
+  if(selVoice>=0&&selVoice<voices.length) u.voice=voices[selVoice];
+  speechSynthesis.speak(u);
+}
+
+// ===== BOOT =====
+checkSession();
+</script>
+</body>
+</html>
